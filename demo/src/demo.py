@@ -296,8 +296,22 @@ class GlassBoxDemo:
             pos = agent.position()
             x, y = self.world_to_screen(pos.x, pos.y)
 
-            # Draw agent triangle
-            color = hex_to_rgb(agent.m_type.color)
+            # Determine color based on agent type and direction
+            color = None
+            if hasattr(agent, "type") and agent.type() == "People":
+                # Placeholder: determine direction (house->factory or factory->house)
+                # If agent is going from house to factory, use yellow
+                # If agent is going from factory to house, use white
+                # This requires logic based on agent's current goal or state
+                if hasattr(agent, "goal") and agent.goal == "Work":
+                    color = (255, 255, 0)  # Yellow
+                elif hasattr(agent, "goal") and agent.goal == "Home":
+                    color = (255, 255, 255)  # White
+                else:
+                    color = (255, 255, 0)  # Default to yellow if unknown
+            else:
+                color = hex_to_rgb(agent.m_type.color)
+
             size = 6
             points = [
                 (x, y - size),
@@ -531,15 +545,15 @@ class GlassBoxDemo:
 
         # Create basic types (matching C++ demo)
         # C++: m_simulation.getMapType("Grass"), etc.
-        grass_type = MapType("Grass", 0x00FF00, 100)
-        water_type = MapType("Water", 0x0000FF, 100)
-        road_type = PathType("Road", 0x888888)
+        grass_type = MapType("Grass", 0x00FF00, 100)      # Green
+        water_type = MapType("Water", 0x0000FF, 100)      # Blue
+        road_type = PathType("Road", 0x808080)            # Grey
         dirt_type = WayType("Dirt", 0x8B4513)
-        home_type = UnitType("Home", color=0xFF0000, radius=1, targets=["People", "Worker"])
-        work_type = UnitType("Work", color=0x0000FF, radius=1, targets=["People", "Worker"])
+        home_type = UnitType("Home", color=0xFF69B4, radius=1, targets=["People", "Worker"])   # Pink
+        work_type = UnitType("Work", color=0x00FFFF, radius=1, targets=["People", "Worker"])   # Cyan
 
         # Create agent types for testing (not in C++ snippet)
-        people_agent_type = AgentType("People", 50.0, 1.0, 0xFFFF00)  # Yellow people
+        people_agent_type = AgentType("People", 50.0, 1.0, 0xFFFF00)  # Yellow (default, direction logic below)
         worker_agent_type = AgentType("Worker", 30.0, 1.0, 0x00FFFF)  # Cyan workers
 
         # --- Paris city
@@ -551,7 +565,7 @@ class GlassBoxDemo:
         # (Python: listeners are set up elsewhere)
 
         # C++: Path& road = paris.addPath(m_simulation.getPathType("Road"));
-        print("Adding paths to Paris...")
+        # print("Adding paths to Paris...")
         road = paris.add_path(road_type)
 
         # C++: Node& n1 = road.addNode(Vector3f(60.0f, 60.0f, 0.0f) + paris.position());
@@ -561,82 +575,82 @@ class GlassBoxDemo:
         # C++: Node& n3 = road.addNode(Vector3f(60.0f, 300.0f, 0.0f) + paris.position());
         n3 = road.add_node(Vector3f(60.0, 300.0, 0.0) + paris.position())
 
-        # C++: Way& w1 = road.addWay(m_simulation.getWayType("Dirt"), n1, n2);
-        w1 = road.add_way(dirt_type, n1, n2)
-        # C++: Way& w2 = road.addWay(m_simulation.getWayType("Dirt"), n2, n3);
-        w2 = road.add_way(dirt_type, n2, n3)
-        # C++: Way& w3 = road.addWay(m_simulation.getWayType("Dirt"), n3, n1);
-        w3 = road.add_way(dirt_type, n3, n1)
+        # # C++: Way& w1 = road.addWay(m_simulation.getWayType("Dirt"), n1, n2);
+        # w1 = road.add_way(dirt_type, n1, n2)
+        # # C++: Way& w2 = road.addWay(m_simulation.getWayType("Dirt"), n2, n3);
+        # w2 = road.add_way(dirt_type, n2, n3)
+        # # C++: Way& w3 = road.addWay(m_simulation.getWayType("Dirt"), n3, n1);
+        # w3 = road.add_way(dirt_type, n3, n1)
 
-        # C++: Unit& u1 = paris.addUnit(m_simulation.getUnitType("Home"), road, w1, 0.66f);
-        u1 = paris.add_unit_on_way(home_type, road, w1, 0.66)
-        # C++: Unit& u2 = paris.addUnit(m_simulation.getUnitType("Home"), road, w1, 0.5f);
-        u2 = paris.add_unit_on_way(home_type, road, w1, 0.5)
-        # C++: Unit& u3 = paris.addUnit(m_simulation.getUnitType("Work"), road, w2, 0.5f);
-        u3 = paris.add_unit_on_way(work_type, road, w2, 0.5)
-        # C++: Unit& u4 = paris.addUnit(m_simulation.getUnitType("Work"), road, w3, 0.5f);
-        u4 = paris.add_unit_on_way(work_type, road, w3, 0.5)
+        # # C++: Unit& u1 = paris.addUnit(m_simulation.getUnitType("Home"), road, w1, 0.66f);
+        # u1 = paris.add_unit_on_way(home_type, road, w1, 0.66)
+        # # C++: Unit& u2 = paris.addUnit(m_simulation.getUnitType("Home"), road, w1, 0.5f);
+        # u2 = paris.add_unit_on_way(home_type, road, w1, 0.5)
+        # # C++: Unit& u3 = paris.addUnit(m_simulation.getUnitType("Work"), road, w2, 0.5f);
+        # u3 = paris.add_unit_on_way(work_type, road, w2, 0.5)
+        # # C++: Unit& u4 = paris.addUnit(m_simulation.getUnitType("Work"), road, w3, 0.5f);
+        # u4 = paris.add_unit_on_way(work_type, road, w3, 0.5)
 
-        # C++: Map& m1 = paris.addMap(m_simulation.getMapType("Grass"));
-        # C++: Map& m2 = paris.addMap(m_simulation.getMapType("Water"));
-        print("Adding maps to Paris...")
-        paris_grass = paris.add_map(grass_type)
-        paris_water = paris.add_map(water_type)
+        # # C++: Map& m1 = paris.addMap(m_simulation.getMapType("Grass"));
+        # # C++: Map& m2 = paris.addMap(m_simulation.getMapType("Water"));
+        # print("Adding maps to Paris...")
+        # paris_grass = paris.add_map(grass_type)
+        # paris_water = paris.add_map(water_type)
 
-        # (Python only: add resources to maps)
-        for u in range(0, 12, 2):
-            for v in range(0, 12, 2):
-                paris_grass.set_resource(u, v, 8)
-        for u in range(1, 12, 3):
-            for v in range(1, 12, 3):
-                paris_water.set_resource(u, v, 50)
+        # # (Python only: add resources to maps)
+        # for u in range(0, 12, 2):
+        #     for v in range(0, 12, 2):
+        #         paris_grass.set_resource(u, v, 8)
+        # for u in range(1, 12, 3):
+        #     for v in range(1, 12, 3):
+        #         paris_water.set_resource(u, v, 50)
 
-        # (Python only: add test agents for animation)
-        print("Adding test agents to Paris...")
-        test_resources = Resources()
-        test_resources.add_resource("food", 5)
-        test_agent = paris.add_agent(people_agent_type, u1, test_resources, "Work")
-        test_agent2 = paris.add_agent(worker_agent_type, u3, test_resources, "Home")
+        # # (Python only: add test agents for animation)
+        # print("Adding test agents to Paris...")
+        # test_resources = Resources()
+        # test_resources.add_resource("food", 5)
+        # test_agent = paris.add_agent(people_agent_type, u1, test_resources, "Work")
+        # test_agent2 = paris.add_agent(worker_agent_type, u3, test_resources, "Home")
 
-        # --- Versailles city
-        # C++: City& versailles = m_simulation.addCity("Versailles", Vector3f(0.0f, 30.0f, 0.0f));
-        print("Creating Versailles...")
-        versailles = self.simulation.add_city("Versailles", Vector3f(0.0, 30.0, 0.0))
+        # # --- Versailles city
+        # # C++: City& versailles = m_simulation.addCity("Versailles", Vector3f(0.0f, 30.0f, 0.0f));
+        # print("Creating Versailles...")
+        # versailles = self.simulation.add_city("Versailles", Vector3f(0.0, 30.0, 0.0))
 
-        # C++: versailles.setListener(*this);
-        # (Python: listeners are set up elsewhere)
+        # # C++: versailles.setListener(*this);
+        # # (Python: listeners are set up elsewhere)
 
-        # C++: versailles.addMap(m_simulation.getMapType("Grass"));
-        # C++: versailles.addMap(m_simulation.getMapType("Water"));
-        print("Adding maps to Versailles...")
-        vers_grass = versailles.add_map(grass_type)
-        vers_water = versailles.add_map(water_type)
+        # # C++: versailles.addMap(m_simulation.getMapType("Grass"));
+        # # C++: versailles.addMap(m_simulation.getMapType("Water"));
+        # print("Adding maps to Versailles...")
+        # vers_grass = versailles.add_map(grass_type)
+        # vers_water = versailles.add_map(water_type)
 
-        # (Python only: add resources to maps)
-        for u in range(0, 12, 3):
-            for v in range(0, 12, 3):
-                vers_grass.set_resource(u, v, 6)
-        for u in range(2, 12, 4):
-            for v in range(2, 12, 4):
-                vers_water.set_resource(u, v, 40)
+        # # (Python only: add resources to maps)
+        # for u in range(0, 12, 3):
+        #     for v in range(0, 12, 3):
+        #         vers_grass.set_resource(u, v, 6)
+        # for u in range(2, 12, 4):
+        #     for v in range(2, 12, 4):
+        #         vers_water.set_resource(u, v, 40)
 
-        # C++: Path& road2 = versailles.addPath(m_simulation.getPathType("Road"));
-        print("Adding paths to Versailles...")
-        road2 = versailles.add_path(road_type)
-        # C++: Node& n4 = road2.addNode(Vector3f(40.0f, 20.0f, 0.0f) + versailles.position());
-        n4 = road2.add_node(Vector3f(40.0, 20.0, 0.0) + versailles.position())
-        # C++: Node& n5 = road2.addNode(Vector3f(300.0f, 300.0f, 0.0f) + versailles.position());
-        n5 = road2.add_node(Vector3f(300.0, 300.0, 0.0) + versailles.position())
+        # # C++: Path& road2 = versailles.addPath(m_simulation.getPathType("Road"));
+        # print("Adding paths to Versailles...")
+        # road2 = versailles.add_path(road_type)
+        # # C++: Node& n4 = road2.addNode(Vector3f(40.0f, 20.0f, 0.0f) + versailles.position());
+        # n4 = road2.add_node(Vector3f(40.0, 20.0, 0.0) + versailles.position())
+        # # C++: Node& n5 = road2.addNode(Vector3f(300.0f, 300.0f, 0.0f) + versailles.position());
+        # n5 = road2.add_node(Vector3f(300.0, 300.0, 0.0) + versailles.position())
 
-        # C++: Way& w4 = road2.addWay(m_simulation.getWayType("Dirt"), n4, n5);
-        w4 = road2.add_way(dirt_type, n4, n5)
-        # C++: Way& w5 = road2.addWay(m_simulation.getWayType("Dirt"), n5, n1);
-        w5 = road2.add_way(dirt_type, n5, n1)  # Connect to Paris
+        # # C++: Way& w4 = road2.addWay(m_simulation.getWayType("Dirt"), n4, n5);
+        # w4 = road2.add_way(dirt_type, n4, n5)
+        # # C++: Way& w5 = road2.addWay(m_simulation.getWayType("Dirt"), n5, n1);
+        # w5 = road2.add_way(dirt_type, n5, n1)  # Connect to Paris
 
-        # C++: Unit& u5 = versailles.addUnit(m_simulation.getUnitType("Home"), road, w5, 0.1f);
-        u5 = versailles.add_unit_on_way(home_type, road, w5, 0.1)
-        # C++: Unit& u6 = versailles.addUnit(m_simulation.getUnitType("Work"), road2, w4, 0.9f);
-        u6 = versailles.add_unit_on_way(work_type, road2, w4, 0.9)
+        # # C++: Unit& u5 = versailles.addUnit(m_simulation.getUnitType("Home"), road, w5, 0.1f);
+        # u5 = versailles.add_unit_on_way(home_type, road, w5, 0.1)
+        # # C++: Unit& u6 = versailles.addUnit(m_simulation.getUnitType("Work"), road2, w4, 0.9f);
+        # u6 = versailles.add_unit_on_way(work_type, road2, w4, 0.9)
 
         print("Demo cities initialized successfully!")
         return True

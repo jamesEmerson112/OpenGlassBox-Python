@@ -2,6 +2,131 @@
 
 A complete Python port of the OpenGlassBox simulation engine with enhanced debug UI capabilities.
 
+# OpenGlassBox
+
+[OpenGlassBox](https://github.com/Lecrapouille/OpenGlassBox) is an implementation of Maxis SimCity 2013 simulation engine named GlassBox, based on the GDC conference 2012 [slides](http://www.andrewwillmott.com/talks/inside-glassbox). This project is neither a Maxis's released code source nor an affiliated project to Maxis but a portage to C++14 of the nicely written code [MultiAgentSimulation](https://github.com/federicodangelo/MultiAgentSimulation), now aged more than 8 years and written in C# for the Unity game engine.
+
+This current project is compiled as:
+- a static/shared libraries of the simulation engine.
+- a standalone demonstration application displayed with SDL2 and DearImgui libraries.
+
+I separated things because I was more interested in the simulation engine than the rendering.
+For rendering the demo application states,  I choosed SDL2 and DearImGui because this was
+the easier way for me but please, use your own personal/prefered rendering engine instead :)
+
+## Python Port (In Progress)
+
+A test-driven Python port of the OpenGlassBox simulation engine is underway in the `python/` directory.
+
+### Porting Approach
+
+- Each C++ test is ported to Python first, then the corresponding module is implemented to make the test pass.
+- The Python port uses modern Python tools (`dataclasses`, `typing`, `pytest`, etc.).
+- Progress is tracked in `PORTING_TO_PYTHON.md`.
+
+### Running Python Tests
+
+1. Set up the Python environment:
+    ```sh
+    cd OpenGlassBox
+    python3 -m venv python/venv
+    python/venv/bin/pip install pytest
+    ```
+
+2. Run all Python tests:
+    ```sh
+    python/venv/bin/python -m pytest python/tests/
+    ```
+
+3. Run a specific test file:
+    ```sh
+    python/venv/bin/python -m pytest python/tests/test_agent.py
+    ```
+
+### Porting Progress
+
+- **All C++ test files in the original tests/ directory have been ported to Python.**
+- Each Python test file includes a descriptive docstring summarizing its coverage and purpose.
+- A test runner script (`python/tests/test_all.py`) is provided to run all tests at once.
+- All tests are passing, and the Python port mirrors the C++ test suite in a test-driven manner.
+- **Implementation Progress:**
+  - **Phase 1-2 (Completed)**: Foundation data classes (Resource, RuleValue, Vector) are implemented.
+  - **Phase 3 (In Progress)**: Following a bottom-up approach based on dependency hierarchy:
+    - **Phase 3A (In Progress)**: Spatial foundation components:
+      - ✅ Map implementation with grid functionality and resource tracking
+      - ✅ MapCoordinatesInsideRadius for efficient radius-based coordinate queries
+      - ✅ MapRandomCoordinates for random grid coordinates generation
+      - ✅ Path implementation with Node/Way graph structure
+      - Dijkstra pathfinding algorithm (Next)
+    - **Phase 3B**: Entity components:
+      - Unit implementation for stationary simulation entities
+      - Agent implementation for mobile resource carriers
+      - Resources container implementation
+    - **Phase 3C**: Coordination container:
+      - City implementation as the central management class
+  - **Phase 4 (Planned)**: Simulation logic and rules
+  - **Phase 5 (Future)**: Demo and visualization
+
+See `PORTING_TO_PYTHON.md` for the full migration plan, checklist, and details on each test file.
+
+---
+## Screenshot of the standalone demo application
+
+Note: this screeenshot may not refer to the latest development state, which also depends on the loaded simulation script.
+Click on the image to watch the video of the simulation.
+[![OpenGlassBox](https://github.com/Lecrapouille/OpenGlassBox/blob/master/doc/OpenGlassBox.png)](https://youtu.be/zyLO9Ls_hME?feature=shared).
+
+In this screenshot:
+- In pink: houses (static).
+- In cyan: factories (static).
+- In yellow: People going from houses to factories (dynamic).
+- In white: People going from factories to houses (dynamic).
+- In grey: nodes (crossroads) and ways (roads) (static).
+- In blue: water produced by factories (dynamic).
+- In green: grass consuming water (dynamic).
+- Grid: city holding maps (grass, water), paths (ways, nodes), and units (producing agents moving along paths and carrying resources from one unit to another unit).
+
+## Download, compile and run
+
+For Mac OS X users a bundle application is also created inside the build folder.
+
+## Notes concerning the portage
+
+Here are the current changes made from the original code source:
+- The original code was made in C# for Unity engine, rewritten in C++ by Quentin Quadrat. I'm porting it to Python for further experiment
+- Quadrat's note: The original project was using the same names as the GDC conference. I renamed classes whose name confused me:
+  - `Box` is now named `City`.
+  - `Point` and `Segment` are now named `Node` and `Way` (since will match more graph theory terms).
+  - `ResourceBinCollection` is simply named `Resources`.
+  - `SimulationDefinitionLoader` is now renamed `ScriptParser`.
+- The original project did not implement `Area` class (aka `Zone`). `Area` manages `Units` (creation, upgrade, destruction). This also has to be added to this project.
+- A `Unit` shall be coupled to a `Node` of the `Path`. This is not particularly nice since this will create a lot of unnecessary graph nodes.
+- The original project implemented a dynamic A* algorithm in `Path::FindNextPoint`. I have created a `Dijkstra` class instead but a real traffic algorithm should have to be developed.
+- Currently, I made a quick & dirty script straightforward parser. My code is less good than the original one. It was ok because I wished to replace the script syntax by [Forth](https://esp32.arduino-forth.com/) (which has less footprint than Lua).
+
+## How to play to demo application?
+
+- For the moment, you cannot construct your game interactively. A prebuild game is made in `demo/Demo.cpp` inside `bool GlassBox::initSimulation()` you can adapt it to create your own map.
+- Simulation script is located at `data/Simulations/TestCity.txt`.
+- Once the demo started, press the `d` key to see the simulation.
+- During the simulation, you can type the `d` key to show/hide the debug window showing the internal states of the simulation.
+
+## Ideas for the next?
+
+    - Enhancing agent
+    - Enhancing test city
+
+## References
+
+- Slides from the GDC conference can be downloaded here http://www.andrewwillmott.com/talks/inside-glassbox
+- Since the video of this conference is no longer available, an alternative GDC conference video can be found here: https://youtu.be/eZfj7LEFT98
+- A Scilab traffic assignment toolbox: https://www.rocq.inria.fr/metalau/ciudadsim and https://www.rocq.inria.fr/metalau/ciudadsim/ftp/CS5/manual/manual.pdf For more information on this work, you can find other PDF at https://jpquadrat.github.io/ in section *Modélisation du Trafic Routier*
+- A tutorial to make a city builder (more focused on rendering with the library SFML) https://www.binpress.com/creating-city-building-game-with-sfml/
+- Moving cars: http://lo-th.github.io/root/traffic/ (code source https://github.com/lo-th/root/tree/gh-pages/traffic a fork based on https://github.com/volkhin/RoadTrafficSimulator)
+- A work-in-progress, open-source, multi-player city simulation game: https://github.com/citybound/citybound
+- An open-source version of the game Transport Tycoon: https://github.com/OpenTTD/OpenTTD
+
+
 ## Overview
 
 OpenGlassBox is a city simulation engine originally written in C++. This Python port provides:
@@ -118,38 +243,6 @@ The enhanced demo includes a comprehensive debug interface:
 ## Development
 
 ### Development Commands
-
-```bash
-# Setup and Installation
-make help           # Show all available commands
-make install-dev    # Install with development dependencies
-make dev-setup      # Create virtual environment and install
-
-# Testing
-make test           # Run basic test suite
-make test-coverage  # Run tests with coverage report
-make test-debug     # Run debug UI specific tests
-make test-demo      # Run demo integration tests
-make test-all       # Run all tests including slow ones
-
-# Performance
-python -m tests.test_performance_benchmarks  # Run performance benchmarks
-
-# Code Quality
-make lint           # Run linters (flake8, mypy)
-make format         # Format code with black and isort
-make check-format   # Check if code formatting is correct
-
-# Building and Distribution
-make build          # Build package distributions
-make clean          # Clean build artifacts
-make upload         # Upload to PyPI (requires credentials)
-
-# Running Applications
-make run-demo       # Run basic demo
-make run-enhanced   # Run enhanced demo with debug UI
-```
-
 ### Project Structure
 
 ```
