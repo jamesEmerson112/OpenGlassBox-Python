@@ -8,12 +8,12 @@ allowing inspection of simulation state including agents, units, maps, and paths
 import pygame
 from typing import Dict, List, Optional, Tuple, Any, Set
 from dataclasses import dataclass
-from city import City
-from simulation import Simulation
-from agent import Agent
-from unit import Unit
-from map import Map
-from path import Path
+from src.city import City
+from src.simulation import Simulation
+from src.agent import Agent
+from src.unit import Unit
+from src.map import Map
+from src.path import Path
 
 # UI Colors
 UI_BACKGROUND = (30, 30, 40, 180)
