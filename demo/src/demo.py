@@ -576,28 +576,29 @@ class GlassBoxDemo:
         n3 = road.add_node(Vector3f(60.0, 300.0, 0.0) + paris.position())
 
         # # C++: Way& w1 = road.addWay(m_simulation.getWayType("Dirt"), n1, n2);
-        # w1 = road.add_way(dirt_type, n1, n2)
+        w1 = road.add_way(dirt_type, n1, n2)
         # # C++: Way& w2 = road.addWay(m_simulation.getWayType("Dirt"), n2, n3);
-        # w2 = road.add_way(dirt_type, n2, n3)
+        w2 = road.add_way(dirt_type, n2, n3)
         # # C++: Way& w3 = road.addWay(m_simulation.getWayType("Dirt"), n3, n1);
-        # w3 = road.add_way(dirt_type, n3, n1)
+        w3 = road.add_way(dirt_type, n3, n1)
 
         # # C++: Unit& u1 = paris.addUnit(m_simulation.getUnitType("Home"), road, w1, 0.66f);
-        # u1 = paris.add_unit_on_way(home_type, road, w1, 0.66)
+        u1 = paris.add_unit_on_way(home_type, road, w1, 0.66)
         # # C++: Unit& u2 = paris.addUnit(m_simulation.getUnitType("Home"), road, w1, 0.5f);
-        # u2 = paris.add_unit_on_way(home_type, road, w1, 0.5)
+        u2 = paris.add_unit_on_way(home_type, road, w1, 0.5)
         # # C++: Unit& u3 = paris.addUnit(m_simulation.getUnitType("Work"), road, w2, 0.5f);
-        # u3 = paris.add_unit_on_way(work_type, road, w2, 0.5)
+        u3 = paris.add_unit_on_way(work_type, road, w2, 0.5)
         # # C++: Unit& u4 = paris.addUnit(m_simulation.getUnitType("Work"), road, w3, 0.5f);
-        # u4 = paris.add_unit_on_way(work_type, road, w3, 0.5)
+        u4 = paris.add_unit_on_way(work_type, road, w3, 0.5)
 
-        # # C++: Map& m1 = paris.addMap(m_simulation.getMapType("Grass"));
-        # # C++: Map& m2 = paris.addMap(m_simulation.getMapType("Water"));
-        # print("Adding maps to Paris...")
-        # paris_grass = paris.add_map(grass_type)
-        # paris_water = paris.add_map(water_type)
+        # C++: Map& m1 = paris.addMap(m_simulation.getMapType("Grass"));
+        # C++: Map& m2 = paris.addMap(m_simulation.getMapType("Water"));
+        print("Adding maps to Paris...")
+        paris_grass = paris.add_map(grass_type)
+        paris_water = paris.add_map(water_type)
 
         # # (Python only: add resources to maps)
+        # we don't need this
         # for u in range(0, 12, 2):
         #     for v in range(0, 12, 2):
         #         paris_grass.set_resource(u, v, 8)
@@ -606,6 +607,7 @@ class GlassBoxDemo:
         #         paris_water.set_resource(u, v, 50)
 
         # # (Python only: add test agents for animation)
+        # only for testing
         # print("Adding test agents to Paris...")
         # test_resources = Resources()
         # test_resources.add_resource("food", 5)
@@ -614,8 +616,8 @@ class GlassBoxDemo:
 
         # # --- Versailles city
         # # C++: City& versailles = m_simulation.addCity("Versailles", Vector3f(0.0f, 30.0f, 0.0f));
-        # print("Creating Versailles...")
-        # versailles = self.simulation.add_city("Versailles", Vector3f(0.0, 30.0, 0.0))
+        print("Creating Versailles...")
+        versailles = self.simulation.add_city("Versailles", Vector3f(0.0, 30.0, 0.0))
 
         # # C++: versailles.setListener(*this);
         # # (Python: listeners are set up elsewhere)
