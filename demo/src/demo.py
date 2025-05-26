@@ -106,13 +106,20 @@ class GlassBoxDemo:
         self.city_names = []
         self.selected_city_index = 0
 
+        # Store all type objects for debug panel
+        self.unit_types = []
+        self.map_types = []
+        self.agent_types = []
+        self.path_types = []
+        self.way_types = []
+
         # Camera/view settings
         self.camera_offset_x = 0
         self.camera_offset_y = 0
         self.zoom = 2.0  # Smaller zoom to see both cities
 
         # Debug flags
-        self.show_debug = False
+        self.show_debug = True
         self.show_maps = True
         self.show_paths = True
         self.show_units = True
@@ -253,8 +260,8 @@ class GlassBoxDemo:
                 x, y = self.world_to_screen(pos.x, pos.y)
 
                 # Draw node circle
-                pygame.draw.circle(surface, WHITE, (x, y), 6)
-                pygame.draw.circle(surface, BLACK, (x, y), 4)
+                pygame.draw.circle(surface, WHITE, (x, y), 3)
+                pygame.draw.circle(surface, BLACK, (x, y), 2)
 
                 # Draw node ID
                 text = self.font.render(str(i), True, WHITE)
@@ -276,10 +283,28 @@ class GlassBoxDemo:
             pos = unit.position()
             x, y = self.world_to_screen(pos.x, pos.y)
 
-            # Draw unit box
+            # Determine unit type
+            unit_type_name = unit.type() if callable(unit.type) else getattr(unit, "type", "Unknown")
             color = hex_to_rgb(unit.color())
-            size = max(8, int(self.zoom * 3))
-            pygame.draw.rect(surface, color, (x - size//2, y - size//2, size, size))
+            base_size = max(8, int(self.zoom * 3))
+
+            if unit_type_name == "Home":
+                # Draw triangle for houses
+                triangle_size = base_size
+                points = [
+                    (x, y - triangle_size // 2),
+                    (x - triangle_size // 2, y + triangle_size // 2),
+                    (x + triangle_size // 2, y + triangle_size // 2)
+                ]
+                pygame.draw.polygon(surface, color, points)
+            elif unit_type_name == "Work":
+                # Draw large rectangle for factories
+                size = base_size * 4
+                pygame.draw.rect(surface, color, (x - size//2, y - size//2, size, size))
+            else:
+                # Default: Draw normal rectangle
+                size = base_size
+                pygame.draw.rect(surface, color, (x - size//2, y - size//2, size, size))
 
     def draw_agents(self, city: City, surface: pygame.Surface):
         """
@@ -360,7 +385,7 @@ class GlassBoxDemo:
 
         # Draw debug panel if enabled
         if self.show_debug:
-            # Background panel
+            # Background panel (bottom left)
             panel_rect = pygame.Rect(10, self.height - 120, 200, 110)
             pygame.draw.rect(surface, (0, 0, 0, 180), panel_rect)
             pygame.draw.rect(surface, WHITE, panel_rect, 1)
@@ -380,6 +405,52 @@ class GlassBoxDemo:
             # Camera info
             text = self.font.render(f"Camera: ({self.camera_offset_x}, {self.camera_offset_y}) Zoom: {self.zoom:.1f}", True, WHITE)
             surface.blit(text, (20, y_offset + 80))
+
+        # --- Type color legend panel (top right) ---
+        legend_panel_width = 220
+        legend_panel_height = 0
+        type_groups = [
+            ("Unit Types", self.unit_types),
+            ("Map Types", self.map_types),
+            ("Agent Types", self.agent_types),
+            ("Path Types", self.path_types),
+            ("Way Types", self.way_types),
+        ]
+        # Calculate height needed
+        for group_name, type_list in type_groups:
+            legend_panel_height += 18  # group title
+            legend_panel_height += 16 * len(type_list)
+            legend_panel_height += 6   # spacing
+        legend_panel_height += 10  # padding
+
+        legend_panel_x = self.width - legend_panel_width - 10
+        legend_panel_y = 10
+        legend_x = legend_panel_x + 10
+        legend_y = legend_panel_y + 10
+
+        # Draw panel background
+        pygame.draw.rect(surface, (0, 0, 0, 180), (legend_panel_x, legend_panel_y, legend_panel_width, legend_panel_height))
+        pygame.draw.rect(surface, WHITE, (legend_panel_x, legend_panel_y, legend_panel_width, legend_panel_height), 1)
+
+        # Draw type groups
+        for group_name, type_list in type_groups:
+            text = self.font.render(group_name + ":", True, WHITE)
+            surface.blit(text, (legend_x, legend_y))
+            legend_y += 18
+            for t in type_list:
+                # Get name and color
+                name = getattr(t, "name", None) or getattr(t, "type", lambda: None)()
+                color_val = getattr(t, "color", None)
+                if callable(color_val):
+                    color_val = color_val()
+                color_rgb = hex_to_rgb(color_val) if color_val is not None else (128, 128, 128)
+                # Draw color swatch
+                pygame.draw.rect(surface, color_rgb, (legend_x, legend_y + 3, 16, 12))
+                # Draw name
+                text = self.font.render(str(name), True, WHITE)
+                surface.blit(text, (legend_x + 22, legend_y))
+                legend_y += 16
+            legend_y += 6
 
     def handle_events(self):
         """Handle pygame events like keyboard and mouse input."""
@@ -556,6 +627,13 @@ class GlassBoxDemo:
         people_agent_type = AgentType("People", 50.0, 1.0, 0xFFFF00)  # Yellow (default, direction logic below)
         worker_agent_type = AgentType("Worker", 30.0, 1.0, 0x00FFFF)  # Cyan workers
 
+        # Store all types for debug panel
+        self.unit_types = [home_type, work_type]
+        self.map_types = [grass_type, water_type]
+        self.agent_types = [people_agent_type, worker_agent_type]
+        self.path_types = [road_type]
+        self.way_types = [dirt_type]
+
         # --- Paris city
         # C++: City& paris = m_simulation.addCity("Paris", Vector3f(400.0f, 200.0f, 0.0f));
         print("Creating Paris...")
@@ -596,23 +674,6 @@ class GlassBoxDemo:
         print("Adding maps to Paris...")
         paris_grass = paris.add_map(grass_type)
         paris_water = paris.add_map(water_type)
-
-        # # (Python only: add resources to maps)
-        # we don't need this
-        # for u in range(0, 12, 2):
-        #     for v in range(0, 12, 2):
-        #         paris_grass.set_resource(u, v, 8)
-        # for u in range(1, 12, 3):
-        #     for v in range(1, 12, 3):
-        #         paris_water.set_resource(u, v, 50)
-
-        # # (Python only: add test agents for animation)
-        # only for testing
-        # print("Adding test agents to Paris...")
-        # test_resources = Resources()
-        # test_resources.add_resource("food", 5)
-        # test_agent = paris.add_agent(people_agent_type, u1, test_resources, "Work")
-        # test_agent2 = paris.add_agent(worker_agent_type, u3, test_resources, "Home")
 
         # # --- Versailles city
         # # C++: City& versailles = m_simulation.addCity("Versailles", Vector3f(0.0f, 30.0f, 0.0f));
