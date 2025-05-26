@@ -1,4 +1,13 @@
 """
+//-----------------------------------------------------------------------------
+// Copyright (c) 2025 An Thien Vo.
+// Based on https://github.com/Lecrapouille/OpenGlassBox
+// Based on https://github.com/federicodangelo/MultiAgentSimulation
+// Distributed under MIT License.
+//-----------------------------------------------------------------------------
+"""
+
+"""
 RuleCommand module for OpenGlassBox simulation engine.
 
 This module implements concrete rule command classes that inherit from IRuleCommand.

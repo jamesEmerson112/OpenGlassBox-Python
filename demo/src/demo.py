@@ -680,40 +680,32 @@ class GlassBoxDemo:
         print("Creating Versailles...")
         versailles = self.simulation.add_city("Versailles", Vector3f(0.0, 30.0, 0.0))
 
-        # # C++: versailles.setListener(*this);
-        # # (Python: listeners are set up elsewhere)
+        # C++: versailles.setListener(*this);
+        # (Python: listeners are set up elsewhere)
 
-        # # C++: versailles.addMap(m_simulation.getMapType("Grass"));
-        # # C++: versailles.addMap(m_simulation.getMapType("Water"));
-        # print("Adding maps to Versailles...")
-        # vers_grass = versailles.add_map(grass_type)
-        # vers_water = versailles.add_map(water_type)
+        # C++: versailles.addMap(m_simulation.getMapType("Grass"));
+        # C++: versailles.addMap(m_simulation.getMapType("Water"));
+        print("Adding maps to Versailles...")
+        vers_grass = versailles.add_map(grass_type)
+        vers_water = versailles.add_map(water_type)
 
-        # # (Python only: add resources to maps)
-        # for u in range(0, 12, 3):
-        #     for v in range(0, 12, 3):
-        #         vers_grass.set_resource(u, v, 6)
-        # for u in range(2, 12, 4):
-        #     for v in range(2, 12, 4):
-        #         vers_water.set_resource(u, v, 40)
+        # C++: Path& road2 = versailles.addPath(m_simulation.getPathType("Road"));
+        print("Adding paths to Versailles...")
+        road2 = versailles.add_path(road_type)
+        # C++: Node& n4 = road2.addNode(Vector3f(40.0f, 20.0f, 0.0f) + versailles.position());
+        n4 = road2.add_node(Vector3f(40.0, 20.0, 0.0) + versailles.position())
+        # C++: Node& n5 = road2.addNode(Vector3f(300.0f, 300.0f, 0.0f) + versailles.position());
+        n5 = road2.add_node(Vector3f(300.0, 300.0, 0.0) + versailles.position())
 
-        # # C++: Path& road2 = versailles.addPath(m_simulation.getPathType("Road"));
-        # print("Adding paths to Versailles...")
-        # road2 = versailles.add_path(road_type)
-        # # C++: Node& n4 = road2.addNode(Vector3f(40.0f, 20.0f, 0.0f) + versailles.position());
-        # n4 = road2.add_node(Vector3f(40.0, 20.0, 0.0) + versailles.position())
-        # # C++: Node& n5 = road2.addNode(Vector3f(300.0f, 300.0f, 0.0f) + versailles.position());
-        # n5 = road2.add_node(Vector3f(300.0, 300.0, 0.0) + versailles.position())
+        # C++: Way& w4 = road2.addWay(m_simulation.getWayType("Dirt"), n4, n5);
+        w4 = road2.add_way(dirt_type, n4, n5)
+        # C++: Way& w5 = road2.addWay(m_simulation.getWayType("Dirt"), n5, n1);
+        w5 = road2.add_way(dirt_type, n5, n1)  # Connect to Paris
 
-        # # C++: Way& w4 = road2.addWay(m_simulation.getWayType("Dirt"), n4, n5);
-        # w4 = road2.add_way(dirt_type, n4, n5)
-        # # C++: Way& w5 = road2.addWay(m_simulation.getWayType("Dirt"), n5, n1);
-        # w5 = road2.add_way(dirt_type, n5, n1)  # Connect to Paris
-
-        # # C++: Unit& u5 = versailles.addUnit(m_simulation.getUnitType("Home"), road, w5, 0.1f);
-        # u5 = versailles.add_unit_on_way(home_type, road, w5, 0.1)
-        # # C++: Unit& u6 = versailles.addUnit(m_simulation.getUnitType("Work"), road2, w4, 0.9f);
-        # u6 = versailles.add_unit_on_way(work_type, road2, w4, 0.9)
+        # C++: Unit& u5 = versailles.addUnit(m_simulation.getUnitType("Home"), road, w5, 0.1f);
+        u5 = versailles.add_unit_on_way(home_type, road, w5, 0.1)
+        # C++: Unit& u6 = versailles.addUnit(m_simulation.getUnitType("Work"), road2, w4, 0.9f);
+        u6 = versailles.add_unit_on_way(work_type, road2, w4, 0.9)
 
         print("Demo cities initialized successfully!")
         return True
