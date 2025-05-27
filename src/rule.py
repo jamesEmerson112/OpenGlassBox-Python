@@ -245,15 +245,6 @@ class RuleMap(IRule):
         """
         return self.m_randomTiles
 
-    def is_random(self) -> bool:
-        """
-        C++ compatibility alias for is_random().
-
-        Returns:
-            True if using random tiles, False otherwise
-        """
-        return self.is_random()
-
     def percent(self, value: Union[int, float]) -> Union[int, float]:
         """
         Compute the percent of the given value.

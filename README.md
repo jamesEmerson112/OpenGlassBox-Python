@@ -179,7 +179,7 @@ cd openglassbox/python
 make install-dev
 
 # Or install with pip
-pip install -e ".[dev]"
+pip install -r requirements.txt
 ```
 
 ### Running the Demos
