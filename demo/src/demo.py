@@ -26,6 +26,7 @@ from src.script_parser import Script
 # Import our new modules
 from demo.src.ui_renderer import UIRenderer
 from demo.src.city_setup import CitySetup
+from demo.src.input_handler import InputHandler
 
 class GlassBoxDemo:
     """
@@ -53,6 +54,12 @@ class GlassBoxDemo:
         # Rendering and setup modules
         self.ui_renderer = UIRenderer(width, height)
         self.city_setup = CitySetup(self.simulation)
+        
+        # Input handling
+        self.input_handler = InputHandler(self)
+        
+        # Store simulation file for restart functionality
+        self.current_simfile = None
 
         # Camera/view settings
         self.camera_offset_x = 0
@@ -61,6 +68,7 @@ class GlassBoxDemo:
 
         # Debug flags
         self.show_debug = True
+        self.show_color_details = False  # Toggle for color details panel
         self.show_tick_counter = True  # Show tick counter by default
         self.show_maps = True
         self.show_paths = True
@@ -93,58 +101,15 @@ class GlassBoxDemo:
 
     def init_demo_cities(self, simfile=None):
         """Initialize demo cities using the CitySetup module."""
+        # Store the simfile for restart functionality
+        if simfile:
+            self.current_simfile = simfile
+        
         return self.city_setup.init_demo_cities(simfile)
 
-    def handle_events(self):
-        """Handle pygame events like keyboard and mouse input."""
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                self.running = False
-
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    self.running = False
-                elif event.key == pygame.K_p:
-                    self.paused = not self.paused
-                    print(f"Simulation {'paused' if self.paused else 'resumed'}")
-                elif event.key == pygame.K_d:
-                    self.show_debug = not self.show_debug
-                elif event.key == pygame.K_t:
-                    self.show_tick_counter = not self.show_tick_counter
-                elif event.key == pygame.K_m:
-                    self.show_maps = not self.show_maps
-                elif event.key == pygame.K_l:
-                    self.show_paths = not self.show_paths
-                elif event.key == pygame.K_u:
-                    self.show_units = not self.show_units
-                elif event.key == pygame.K_a:
-                    self.show_agents = not self.show_agents
-                elif event.key == pygame.K_r:
-                    # Reset view
-                    self.camera_offset_x = 0
-                    self.camera_offset_y = 0
-                    self.zoom = 2.0
-
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == 1:  # Left mouse button
-                    self.dragging = True
-                    self.last_mouse_x, self.last_mouse_y = event.pos
-                elif event.button == 4:  # Mouse wheel up
-                    self.zoom *= 1.1
-                elif event.button == 5:  # Mouse wheel down
-                    self.zoom /= 1.1
-
-            elif event.type == pygame.MOUSEBUTTONUP:
-                if event.button == 1:  # Left mouse button
-                    self.dragging = False
-
-            elif event.type == pygame.MOUSEMOTION:
-                if self.dragging:
-                    dx = event.pos[0] - self.last_mouse_x
-                    dy = event.pos[1] - self.last_mouse_y
-                    self.camera_offset_x += dx
-                    self.camera_offset_y += dy
-                    self.last_mouse_x, self.last_mouse_y = event.pos
+    def handle_mouse_click(self, pos: Tuple[int, int]):
+        """Handle mouse clicks."""
+        pass
 
     def update(self, dt: float):
         """
@@ -200,6 +165,10 @@ class GlassBoxDemo:
                 self.screen, debug_options, 
                 self.camera_offset_x, self.camera_offset_y, self.zoom
             )
+        
+        # Draw color details panel if enabled
+        if self.show_color_details:
+            self.ui_renderer.draw_color_details_panel(self.screen, self.simulation)
 
         # Flip display
         pygame.display.flip()
@@ -215,6 +184,13 @@ class GlassBoxDemo:
         4. Control frame rate
         """
         print("Starting demo game loop...")
+        print("🎮 CONTROLS:")
+        print("  P = Pause/Resume")
+        print("  F5 or Ctrl+R = RESTART SIMULATION")
+        print("  R = Reset View")
+        print("  D = Toggle Simple Debug Panel")
+        print("  I = Toggle Color Details Panel")
+        print("  ESC = Quit")
         
         # Target 60 FPS for smooth animation
         target_fps = 60
@@ -223,8 +199,8 @@ class GlassBoxDemo:
             # Calculate delta time for smooth simulation updates
             dt = self.clock.tick(target_fps) / 1000.0  # Convert to seconds
             
-            # Handle all user input
-            self.handle_events()
+            # Handle all user input using the InputHandler
+            self.input_handler.handle_events()
             
             # Update simulation state (this increments ticks and runs rules)
             self.update(dt)
