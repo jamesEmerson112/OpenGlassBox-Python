@@ -8,9 +8,16 @@ simulation.
 
 from dataclasses import dataclass
 from typing import Optional, List, Dict, Any
+import os
 
 from .vector import Vector3f
 from .resources import Resources
+
+
+def debug_print(*args, **kwargs):
+    """Print debug messages only if OPENGLASSBOX_DEBUG environment variable is set."""
+    if os.environ.get('OPENGLASSBOX_DEBUG'):
+        print(*args, **kwargs)
 
 
 @dataclass
@@ -50,6 +57,12 @@ class Agent:
         self.m_currentWay = None
         self.m_lastNode = owner.node()
         self.m_nextNode = None
+        
+        # Debug: log initial resources
+        debug_print(f"Agent {self.m_id} created with {len(self.m_resources.container())} resources:")
+        for resource in self.m_resources.container():
+            debug_print(f"  - {resource.type()}: {resource.get_amount()}/{resource.get_capacity()}")
+        
 
     def id(self) -> int:
         """Get the unique identifier of the agent."""
@@ -95,14 +108,21 @@ class Agent:
         """
         # Reached the destination node?
         if self.m_nextNode is None:
+            debug_print(f"Agent {self.m_id} at node, pos: {self.m_position}, target: {self.m_searchTarget}")
             # Yes! Transfer resources to the Unit.
             # Has Agent no more resource?
             if self._unload_resources():
                 # Yes! Return true to remove it!
+                debug_print(f"Agent {self.m_id} REMOVED - no more resources after unload")
                 return True
             else:
                 # No! Keep finding another destination to unload resources.
+                debug_print(f"Agent {self.m_id} still has resources, finding next node...")
                 self._find_next_node(dijkstra)
+                if self.m_nextNode is None:
+                    debug_print(f"Agent {self.m_id} FAILED to find next node - will be removed next update")
+                else:
+                    debug_print(f"Agent {self.m_id} found next node: {self.m_nextNode.position()}")
         else:
             # Move the Agent towards the next Node.
             self._move_towards_next_node()
@@ -134,9 +154,18 @@ class Agent:
             True if the agent has no more resources to carry
         """
         unit = self._search_unit()
+        debug_print(f"Agent {self.m_id} searching for unit at node {self.m_lastNode.position() if self.m_lastNode else 'None'}, found: {unit is not None}")
         if unit is not None:
+            debug_print(f"Agent {self.m_id} transferring resources to unit {unit.type()}")
             self.m_resources.transfer_resources_to(unit.resources())
-        return self.m_resources.is_empty()
+        else:
+            debug_print(f"Agent {self.m_id} no unit found to accept resources")
+        is_empty = self.m_resources.is_empty()
+        debug_print(f"Agent {self.m_id} resources empty after unload: {is_empty}")
+        debug_print(f"Agent {self.m_id} current resources:")
+        for resource in self.m_resources.container():
+            debug_print(f"  - {resource.type()}: {resource.get_amount()}/{resource.get_capacity()}")
+        return is_empty
 
     def _find_next_node(self, dijkstra) -> None:
         """

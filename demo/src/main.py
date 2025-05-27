@@ -6,9 +6,22 @@ This file mirrors the functionality of demo/src/main.cpp in the C++ implementati
 
 import sys
 import os
+import argparse
 
 def main():
     """Main entry point for the OpenGlassBox demo."""
+    # Parse command line arguments
+    parser = argparse.ArgumentParser(description='OpenGlassBox Simulation Demo')
+    parser.add_argument('--debug', action='store_true', 
+                        help='Enable debug logging for agents and other components')
+    args = parser.parse_args()
+
+    # Set global debug flag
+    import os
+    if args.debug:
+        os.environ['OPENGLASSBOX_DEBUG'] = '1'
+        print("🐛 Debug mode enabled - agent debug logging activated")
+
     # Set up paths - add the main python directory to sys.path
     script_dir = os.path.dirname(os.path.abspath(__file__))
     python_root = os.path.abspath(os.path.join(script_dir, '../../'))
@@ -23,7 +36,7 @@ def main():
     demo = GlassBoxDemo(1024, 768, "OpenGlassBox Simulation")
 
     # Try to initialize with TestCityFixed.txt
-    simfile = "../data/Simulations/TestCityFixed.txt"
+    simfile = "../data/Simulations/TestCity.txt"
     print(f"Attempting to initialize simulation with {simfile}")
     if not demo.init_demo_cities(simfile):
         print(f"Failed to initialize simulation with {simfile}")
