@@ -217,21 +217,23 @@ class Map:
 
     def execute_rules(self) -> None:
         """Execute map rules for the current simulation step."""
-        self.m_ticks += 1
+        self.m_ticks += 1  # Increment the tick counter for this map
 
         for rule in self.m_type.rules:
+            # Only execute rules at their specified rate (every N ticks)
             if self.m_ticks % rule.rate() == 0:
                 if rule.is_random():
-                    # Execute on random tiles
+                    # If the rule is random, execute it on a random subset of tiles
                     self.m_randomCoordinates.init(self.m_gridSizeU, self.m_gridSizeV)
                     tiles_amount = rule.percent(self.m_gridSizeU * self.m_gridSizeV)
 
                     while tiles_amount > 0:
+                        # For each randomly selected tile, set context and execute the rule
                         if self.m_randomCoordinates.next(self.m_context.u, self.m_context.v):
                             rule.execute(self.m_context)
                         tiles_amount -= 1
                 else:
-                    # Execute on all tiles
+                    # Otherwise, execute the rule on every tile in the map
                     for u in range(self.m_gridSizeU):
                         self.m_context.u = u
                         for v in range(self.m_gridSizeV):
