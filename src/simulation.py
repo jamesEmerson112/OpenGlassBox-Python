@@ -118,6 +118,7 @@ class Simulation(Script):
         city = City(name, position, self.m_gridSizeU, self.m_gridSizeV)
         self.m_cities[name] = city
         self.m_listener.onCityAdded(city)
+        print(f"City {name} added")
         return city
 
     def get_city(self, name: str) -> City:

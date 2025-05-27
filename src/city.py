@@ -254,6 +254,7 @@ class City:
         new_map = Map(map_type, self)
         self.m_maps[map_type.name] = new_map
         self.m_listener.on_map_added(new_map)
+        print(f"Map {map_type.name} added")
         return new_map
 
     def get_map(self, map_id: str):
@@ -287,6 +288,7 @@ class City:
         new_path = Path(path_type)
         self.m_paths[path_type.name] = new_path
         self.m_listener.on_path_added(new_path)
+        print(f"Path {path_type.name} added")
         return new_path
 
     def get_path(self, path_id: str):
