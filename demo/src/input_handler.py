@@ -18,9 +18,6 @@ class InputHandler:
         """Restart the simulation from scratch."""
         print("🔄 RESTARTING SIMULATION...")
         
-        # Clear current simulation
-        self.demo.simulation.clear_cities()
-        
         # Reset demo state
         self.demo.camera_offset_x = 0
         self.demo.camera_offset_y = 0
@@ -90,6 +87,13 @@ class InputHandler:
                         print("🎨 Color details panel enabled - shows entity colors!")
                     else:
                         print("📊 Color details panel disabled")
+                elif event.key == pygame.K_c:
+                    # Toggle comprehensive debug panel
+                    self.demo.show_comprehensive_debug = not self.demo.show_comprehensive_debug
+                    if self.demo.show_comprehensive_debug:
+                        print("🔬 Comprehensive debug panel enabled - detailed simulation introspection!")
+                    else:
+                        print("📋 Comprehensive debug panel disabled")
                 elif event.key == pygame.K_t:
                     self.demo.show_tick_counter = not self.demo.show_tick_counter
                 elif event.key == pygame.K_m:

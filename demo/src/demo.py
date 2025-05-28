@@ -69,6 +69,7 @@ class GlassBoxDemo:
         # Debug flags
         self.show_debug = True
         self.show_color_details = False  # Toggle for color details panel
+        self.show_comprehensive_debug = False  # Toggle for comprehensive debug panel
         self.show_tick_counter = True  # Show tick counter by default
         self.show_maps = True
         self.show_paths = True
@@ -170,6 +171,10 @@ class GlassBoxDemo:
         if self.show_color_details:
             self.ui_renderer.draw_color_details_panel(self.screen, self.simulation)
 
+        # Draw comprehensive debug panel if enabled
+        if self.show_comprehensive_debug:
+            self.ui_renderer.draw_comprehensive_debug_panel(self.screen, self.simulation)
+
         # Flip display
         pygame.display.flip()
 
@@ -190,6 +195,7 @@ class GlassBoxDemo:
         print("  R = Reset View")
         print("  D = Toggle Simple Debug Panel")
         print("  I = Toggle Color Details Panel")
+        print("  C = Toggle Comprehensive Debug Panel")
         print("  ESC = Quit")
         
         # Target 60 FPS for smooth animation
