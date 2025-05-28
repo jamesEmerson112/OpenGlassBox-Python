@@ -72,6 +72,10 @@ class InputHandler:
             if event.type == pygame.QUIT:
                 self.demo.running = False
 
+            elif event.type == pygame.VIDEORESIZE:
+                # Handle window resize events
+                self.demo.handle_window_resize(event.w, event.h)
+
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     self.demo.running = False
@@ -113,6 +117,12 @@ class InputHandler:
                 elif event.key == pygame.K_F5 or (event.key == pygame.K_r and pygame.key.get_pressed()[pygame.K_LCTRL]):
                     # F5 or Ctrl+R for restart
                     self.restart_simulation()
+                elif event.key == pygame.K_F11:
+                    # F11 for fullscreen toggle
+                    self.demo.toggle_fullscreen()
+                elif event.key == pygame.K_RETURN and (pygame.key.get_pressed()[pygame.K_LALT] or pygame.key.get_pressed()[pygame.K_RALT]):
+                    # Alt+Enter for fullscreen toggle (alternative binding)
+                    self.demo.toggle_fullscreen()
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:  # Left mouse button
