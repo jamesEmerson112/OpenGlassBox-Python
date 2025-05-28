@@ -1,4 +1,13 @@
 """
+//-----------------------------------------------------------------------------
+// Copyright (c) 2025 An Thien Vo.
+// Based on https://github.com/Lecrapouille/OpenGlassBox
+// Based on https://github.com/federicodangelo/MultiAgentSimulation
+// Distributed under MIT License.
+//-----------------------------------------------------------------------------
+"""
+
+"""
 RuleCommand module for OpenGlassBox simulation engine.
 
 This module implements concrete rule command classes that inherit from IRuleCommand.
@@ -236,10 +245,10 @@ class RuleCommandAgent(IRuleCommand):
         Args:
             context: The rule execution context
         """
-        if context.unit is not None and hasattr(context.unit, 'hasWays') and context.unit.has_ways():
+        if context.unit is not None and hasattr(context.unit, 'has_ways') and context.unit.has_ways():
             # Add agent to the city
-            if context.city is not None and hasattr(context.city, 'addAgent'):
-                context.city.addAgent(self, context.unit, self.m_resources, self.m_target)
+            if context.city is not None and hasattr(context.city, 'add_agent'):
+                context.city.add_agent(self.agent_type, context.unit, self.m_resources, self.m_target)
         else:
             # Debug message equivalent to C++ version
             import sys

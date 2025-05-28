@@ -173,7 +173,7 @@ class RuleValueMap(IRuleValue):
         Returns:
             The amount of the map resource
         """
-        return context.city.getMap(self.m_mapId).get_resource(context.u, context.v, context.radius)
+        return context.city.get_map(self.m_mapId).get_resource(context.u, context.v, context.radius)
 
     def capacity(self, context: RuleContext) -> int:
         """
@@ -185,7 +185,7 @@ class RuleValueMap(IRuleValue):
         Returns:
             The capacity of the map resource
         """
-        return context.city.getMap(self.m_mapId).get_capacity()
+        return context.city.get_map(self.m_mapId).get_capacity()
 
     def add(self, context: RuleContext, to_add: int) -> None:
         """
@@ -195,7 +195,7 @@ class RuleValueMap(IRuleValue):
             context: The rule context containing reference to resources
             to_add: The amount to add
         """
-        context.city.getMap(self.m_mapId).add_resource(context.u, context.v, context.radius, to_add)
+        context.city.get_map(self.m_mapId).add_resource(context.u, context.v, context.radius, to_add)
 
     def remove(self, context: RuleContext, to_remove: int) -> None:
         """
@@ -205,7 +205,7 @@ class RuleValueMap(IRuleValue):
             context: The rule context containing reference to resources
             to_remove: The amount to remove
         """
-        context.city.getMap(self.m_mapId).remove_resource(context.u, context.v, context.radius, to_remove)
+        context.city.get_map(self.m_mapId).remove_resource(context.u, context.v, context.radius, to_remove)
 
     def type(self) -> str:
         """

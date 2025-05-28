@@ -362,7 +362,9 @@ class DebugUI:
             return False
 
         x, y = pos
-        panel_x = 10
+        # Position panel on top-right corner
+        screen_width = 800  # Default screen width, could be passed in
+        panel_x = screen_width - self.panel_width - 10
         panel_y = 10
 
         # Check if click is within debug panel
@@ -394,7 +396,9 @@ class DebugUI:
         if not self.visible:
             return
 
-        panel_x = 10
+        # Position panel on top-right corner
+        screen_width = surface.get_width()
+        panel_x = screen_width - self.panel_width - 10
         panel_y = 10
 
         # Draw background panel
@@ -403,7 +407,7 @@ class DebugUI:
         current_y = panel_y + 10
 
         # City selection combo
-        city_names = [city.name() for city in simulation.cities()]
+        city_names = [city.name() for city in simulation.cities().values()]
         if city_names:
             # Ensure selected city index is valid
             self.ui_state.selected_city = max(0, min(self.ui_state.selected_city, len(city_names) - 1))
@@ -417,7 +421,7 @@ class DebugUI:
 
             # Debug selected city
             if city_names:
-                selected_city_obj = simulation.cities()[self.ui_state.selected_city]
+                selected_city_obj = list(simulation.cities().values())[self.ui_state.selected_city]
                 self.debug_city(surface, selected_city_obj, panel_x + 10, current_y)
         else:
             self.draw_text(surface, "No cities available", panel_x + 10, current_y)

@@ -78,13 +78,15 @@ class Unit:
         Execute simulation rules given by UnitType (defined by the simulation script).
         Equivalent to C++ void executeRules().
         """
-        self.m_ticks += 1
+        self.m_ticks += 1  # Increment the tick counter for this unit
 
         # Execute rules in reverse order (C++ pattern: size_t i = m_type.rules.size(); while (i--))
         i = len(self.m_type.rules)
         while i > 0:
             i -= 1
+            # Only execute rules at their specified rate (every N ticks)
             if self.m_ticks % self.m_type.rules[i].rate() == 0:
+                # Execute the rule with the current context (unit, city, resources, etc.)
                 self.m_type.rules[i].execute(self.m_context)
 
     def accepts(self, searchTarget: str, resourcesToTryToAdd: Resources) -> bool:

@@ -68,6 +68,7 @@ class Simulation(Script):
         self.m_gridSizeU = gridSizeU
         self.m_gridSizeV = gridSizeV
         self.m_time = 0.0
+        self.m_totalTicks = 0  # Add tick counter for debug display
         self.m_cities: Dict[str, City] = {}
 
         # Static listener equivalent to C++ static Simulation::Listener listener
@@ -99,9 +100,19 @@ class Simulation(Script):
         while (self.m_time >= 1.0 / TICKS_PER_SECOND) and (maxIterations > 0):
             self.m_time -= 1.0 / TICKS_PER_SECOND
             maxIterations -= 1
+            self.m_totalTicks += 1  # Increment tick counter
 
             for city in self.m_cities.values():
                 city.update()
+
+    def get_total_ticks(self) -> int:
+        """
+        Get the total number of simulation ticks that have elapsed.
+        
+        Returns:
+            The total tick count
+        """
+        return self.m_totalTicks
 
     def add_city(self, name: str, position: Vector3f) -> City:
         """
@@ -118,6 +129,7 @@ class Simulation(Script):
         city = City(name, position, self.m_gridSizeU, self.m_gridSizeV)
         self.m_cities[name] = city
         self.m_listener.onCityAdded(city)
+        print(f"City {name} added")
         return city
 
     def get_city(self, name: str) -> City:

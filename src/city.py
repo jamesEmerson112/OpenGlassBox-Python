@@ -254,6 +254,7 @@ class City:
         new_map = Map(map_type, self)
         self.m_maps[map_type.name] = new_map
         self.m_listener.on_map_added(new_map)
+        print(f"Map {map_type.name} added")
         return new_map
 
     def get_map(self, map_id: str):
@@ -287,6 +288,7 @@ class City:
         new_path = Path(path_type)
         self.m_paths[path_type.name] = new_path
         self.m_listener.on_path_added(new_path)
+        print(f"Path {path_type.name} added")
         return new_path
 
     def get_path(self, path_id: str):
@@ -346,7 +348,7 @@ class City:
         Args:
             agent_type: Type definition for the agent
             owner: The unit that created/owns the agent
-            resources: Resources that the agent carries
+            resources: Resources that the agent carries (will be copied for each agent)
             search_target: Type of unit the agent is looking for
 
         Returns:
@@ -355,7 +357,11 @@ class City:
         # Import here to avoid circular imports
         from .agent import Agent
 
-        new_agent = Agent(self.m_nextAgentId, agent_type, owner, resources, search_target)
+        # Create a deep copy of resources for each agent to avoid sharing
+        agent_resources = Resources()
+        agent_resources.add_resources(resources)
+        
+        new_agent = Agent(self.m_nextAgentId, agent_type, owner, agent_resources, search_target)
         self.m_nextAgentId += 1
         self.m_agents.append(new_agent)
         self.m_listener.on_agent_added(new_agent)

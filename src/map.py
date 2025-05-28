@@ -13,6 +13,7 @@ from .vector import Vector3f
 from .map_coordinates_inside_radius import MapCoordinatesInsideRadius
 from .map_random_coordinates import MapRandomCoordinates
 from .resource import Resource
+from . import config
 
 
 @dataclass
@@ -73,10 +74,11 @@ class Map:
         if amount > self.m_type.capacity:
             amount = self.m_type.capacity
 
-        # Update resource amount
+        # Update resource amount with optimization check (like C++)
         index = v * self.m_gridSizeU + u
         if index < len(self.m_resources):
-            self.m_resources[index] = amount
+            if self.m_resources[index] != amount:
+                self.m_resources[index] = amount
 
     def get_resource(self, u: int, v: int, radius: Optional[int] = None) -> int:
         """
@@ -102,8 +104,10 @@ class Map:
             x, y = u, v
             self.m_coordinates.init(radius, x, y, 0, self.m_gridSizeU, 0, self.m_gridSizeV, False)
 
-            while self.m_coordinates.next(x, y):
+            success, x, y = self.m_coordinates.next()
+            while success:
                 total += self.get_resource(x, y)
+                success, x, y = self.m_coordinates.next()
 
             return total
 
@@ -135,7 +139,8 @@ class Map:
             x, y = u, v
 
             self.m_coordinates.init(radius, x, y, 0, self.m_gridSizeU, 0, self.m_gridSizeV, distributed)
-            while (remaining > 0) and self.m_coordinates.next(x, y):
+            success, x, y = self.m_coordinates.next()
+            while (remaining > 0) and success:
                 amount = self.get_resource(x, y)
                 add_amount = min(self.m_type.capacity - amount, remaining)
 
@@ -144,6 +149,7 @@ class Map:
                     if distributed:
                         remaining -= add_amount
                     self.set_resource(x, y, amount)
+                success, x, y = self.m_coordinates.next()
 
     def remove_resource(self, u: int, v: int, to_remove: int, radius: Optional[int] = None, distributed: bool = True) -> None:
         """
@@ -172,7 +178,8 @@ class Map:
             x, y = u, v
 
             self.m_coordinates.init(radius, x, y, 0, self.m_gridSizeU, 0, self.m_gridSizeV, distributed)
-            while (remaining > 0) and self.m_coordinates.next(x, y):
+            success, x, y = self.m_coordinates.next()
+            while (remaining > 0) and success:
                 amount = self.get_resource(x, y)
                 remove_amount = min(amount, remaining)
 
@@ -181,6 +188,7 @@ class Map:
                     if distributed:
                         remaining -= remove_amount
                     self.set_resource(x, y, amount)
+                success, x, y = self.m_coordinates.next()
 
     def get_world_position(self, u: int, v: int) -> Vector3f:
         """
@@ -193,16 +201,13 @@ class Map:
         Returns:
             World position as Vector3f
         """
-        # For simplicity, use a default grid size of 1.0
-        GRID_SIZE = 1.0
-
         # Clamp coordinates to grid bounds
         u_clamped = max(0, min(u, self.m_gridSizeU))
         v_clamped = max(0, min(v, self.m_gridSizeV))
 
         return Vector3f(
-            float(u_clamped) * GRID_SIZE,
-            float(v_clamped) * GRID_SIZE,
+            float(u_clamped) * config.GRID_SIZE,
+            float(v_clamped) * config.GRID_SIZE,
             0.0
         )
 
@@ -217,24 +222,33 @@ class Map:
 
     def execute_rules(self) -> None:
         """Execute map rules for the current simulation step."""
-        self.m_ticks += 1
+        self.m_ticks += 1  # Increment the tick counter for this map
 
         for rule in self.m_type.rules:
+            # Only execute rules at their specified rate (every N ticks)
             if self.m_ticks % rule.rate() == 0:
                 if rule.is_random():
-                    # Execute on random tiles
+                    # If the rule is random, execute it on a random subset of tiles
                     self.m_randomCoordinates.init(self.m_gridSizeU, self.m_gridSizeV)
                     tiles_amount = rule.percent(self.m_gridSizeU * self.m_gridSizeV)
 
                     while tiles_amount > 0:
-                        if self.m_randomCoordinates.next(self.m_context.u, self.m_context.v):
+                        # For each randomly selected tile, set context and execute the rule
+                        success, u, v = self.m_randomCoordinates.next()
+                        if success:
+                            self.m_context.u = u
+                            self.m_context.v = v
                             rule.execute(self.m_context)
                         tiles_amount -= 1
                 else:
-                    # Execute on all tiles
-                    for u in range(self.m_gridSizeU):
+                    # Use C++-style decrementing loops for consistency
+                    u = self.m_gridSizeU
+                    while u > 0:
+                        u -= 1  # Decrement at beginning like C++ --u
                         self.m_context.u = u
-                        for v in range(self.m_gridSizeV):
+                        v = self.m_gridSizeV
+                        while v > 0:
+                            v -= 1  # Decrement at beginning like C++ --v
                             self.m_context.v = v
                             rule.execute(self.m_context)
 
@@ -272,7 +286,9 @@ class RuleContext:
     """Context information for rule execution."""
     def __init__(self):
         self.city = None
-        self.u = 0
-        self.v = 0
+        self.unit = None
         self.locals = None
         self.globals = None
+        self.u = 0
+        self.v = 0
+        self.radius = 0
