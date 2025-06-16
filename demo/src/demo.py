@@ -23,15 +23,15 @@ from src.simulation import Simulation
 from src.city import City
 from src.script_parser import Script
 
-# Import our new modules
-from demo.src.ui_renderer import UIRenderer
-from demo.src.city_setup import CitySetup
-from demo.src.input_handler import InputHandler
+# Import our modules using direct imports
+from ui_renderer import UIRenderer
+from city_setup import CitySetup
+from input_handler import InputHandler
 
 class GlassBoxDemo:
     """
     Main demo application for visualizing OpenGlassBox simulations.
-    
+
     This class handles the main game loop, user input, and coordinates
     between the simulation engine and the UI renderer.
     """
@@ -50,14 +50,14 @@ class GlassBoxDemo:
         # Simulation components
         self.simulation = Simulation(12, 12)  # 12x12 grid like C++ demo
         self.script_parser = Script()
-        
+
         # Rendering and setup modules
         self.ui_renderer = UIRenderer(width, height)
         self.city_setup = CitySetup(self.simulation)
-        
+
         # Input handling
         self.input_handler = InputHandler(self)
-        
+
         # Store simulation file for restart functionality
         self.current_simfile = None
 
@@ -104,7 +104,7 @@ class GlassBoxDemo:
         # Store the simfile for restart functionality
         if simfile:
             self.current_simfile = simfile
-        
+
         return self.city_setup.init_demo_cities(simfile)
 
     def handle_mouse_click(self, pos: Tuple[int, int]):
@@ -114,7 +114,7 @@ class GlassBoxDemo:
     def update(self, dt: float):
         """
         Update simulation state.
-        
+
         This is the key method where the simulation progresses.
         The dt (delta time) controls how fast the simulation runs.
         """
@@ -139,7 +139,7 @@ class GlassBoxDemo:
             # Draw all cities using the UI renderer
             for city_name, city in self.simulation.cities().items():
                 self.ui_renderer.draw_city(
-                    city, self.screen, self.zoom, 
+                    city, self.screen, self.zoom,
                     self.camera_offset_x, self.camera_offset_y,
                     self.show_maps, self.show_paths, self.show_units, self.show_agents
                 )
@@ -147,7 +147,7 @@ class GlassBoxDemo:
         # Draw UI elements on top
         fps = int(self.clock.get_fps())
         self.ui_renderer.draw_status(self.screen, self.paused, fps)
-        
+
         # Draw tick counter (this shows how many simulation steps have happened)
         tick_count = self.simulation.get_total_ticks()
         self.ui_renderer.draw_tick_counter(self.screen, tick_count, self.show_tick_counter)
@@ -162,10 +162,10 @@ class GlassBoxDemo:
                 "Show Agents": self.show_agents
             }
             self.ui_renderer.draw_debug_panel(
-                self.screen, debug_options, 
+                self.screen, debug_options,
                 self.camera_offset_x, self.camera_offset_y, self.zoom
             )
-        
+
         # Draw color details panel if enabled
         if self.show_color_details:
             self.ui_renderer.draw_color_details_panel(self.screen, self.simulation)
@@ -176,7 +176,7 @@ class GlassBoxDemo:
     def run(self):
         """
         Main game loop - this is the heart of the application.
-        
+
         This method runs continuously until the user quits:
         1. Handle user input events
         2. Update the simulation state (if not paused)
@@ -191,20 +191,20 @@ class GlassBoxDemo:
         print("  D = Toggle Simple Debug Panel")
         print("  I = Toggle Color Details Panel")
         print("  ESC = Quit")
-        
+
         # Target 60 FPS for smooth animation
         target_fps = 60
-        
+
         while self.running:
             # Calculate delta time for smooth simulation updates
             dt = self.clock.tick(target_fps) / 1000.0  # Convert to seconds
-            
+
             # Handle all user input using the InputHandler
             self.input_handler.handle_events()
-            
+
             # Update simulation state (this increments ticks and runs rules)
             self.update(dt)
-            
+
             # Render everything to screen
             self.render()
 
@@ -216,16 +216,16 @@ class GlassBoxDemo:
 def main():
     """
     Main entry point for the demo application.
-    
+
     This sets up the demo, loads the scenario file, and starts the game loop.
     """
     print("OpenGlassBox Demo Starting...")
-    
+
     # Create demo instance
     demo = GlassBoxDemo(800, 600, "OpenGlassBox Simulation Demo")
-    
-    # Try to load TestCity scenario
-    simfile = "../data/Simulations/TestCity.txt"
+
+    # Try to load TestCity scenario using absolute path
+    simfile = os.path.abspath(os.path.join(script_dir, "../data/Simulations/TestCity.txt"))
     if os.path.exists(simfile):
         print(f"Loading scenario: {simfile}")
         if not demo.init_demo_cities(simfile):
@@ -237,7 +237,7 @@ def main():
         if not demo.init_demo_cities():
             print("Failed to create demo cities, exiting...")
             return
-    
+
     # Start the main game loop
     demo.run()
 
