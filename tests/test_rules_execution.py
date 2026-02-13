@@ -4,10 +4,9 @@ Test script to verify that units with parsed types execute rules properly.
 This reproduces the issue where Python side doesn't show the same rule execution as C++.
 """
 
-import sys
 import time
-from src.simulation import Simulation
-from src.vector import Vector3f
+from openglassbox.simulation import Simulation
+from openglassbox.vector import Vector3f
 
 def test_rules_execution():
     """Test that units execute rules from parsed script."""

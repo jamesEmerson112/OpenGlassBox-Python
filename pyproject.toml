@@ -63,21 +63,20 @@ performance = [
 "Documentation" = "https://openglassbox.readthedocs.io/"
 
 [project.scripts]
-openglassbox-demo = "openglassbox.demo.src.main:main"
-openglassbox-demo-enhanced = "openglassbox.demo.src.demo_enhanced:main"
-openglassbox-run-demo = "openglassbox.demo.src.run_demo:main"
+openglassbox-demo = "demo.src.main:main"
+openglassbox-run-demo = "demo.src.run_demo:main"
 
 [tool.setuptools]
 package-dir = {"" = "."}
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["openglassbox*"]
+include = ["openglassbox*", "demo*"]
 exclude = ["tests*"]
 
 [tool.setuptools.package-data]
-openglassbox = [
-    "data/simulations/*.txt",
+demo = [
+    "data/Simulations/*.txt",
     "data/fonts/*.ttf",
     "data/textures/*.png",
 ]

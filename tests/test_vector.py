@@ -16,7 +16,7 @@ in the simulation.
 import pytest
 import math
 from typing import List, Tuple
-from src.vector import Vector2D, Vector3D
+from openglassbox.vector import Vector2D, Vector3D
 
 
 def test_vector3d_initialization():

@@ -28,11 +28,11 @@ class InputHandler:
         self.demo.paused = True
         
         # Reinitialize simulation
-        from src.simulation import Simulation
+        from openglassbox.simulation import Simulation
         self.demo.simulation = Simulation(12, 12)
         
         # Recreate city setup with new simulation
-        from demo.src.city_setup import CitySetup
+        from .city_setup import CitySetup
         self.demo.city_setup = CitySetup(self.demo.simulation)
         
         # Reload the same scenario file

@@ -11,13 +11,13 @@ The tests ensure that City objects and their coordinate logic behave as expected
 """
 
 import pytest
-from src.city import City
-from src.vector import Vector3f
-from src.map import MapType
-from src.path import PathType, WayType
-from src.unit import UnitType
-from src.agent import AgentType
-from src.resources import Resources
+from openglassbox.city import City
+from openglassbox.vector import Vector3f
+from openglassbox.map import MapType
+from openglassbox.path import PathType, WayType
+from openglassbox.unit import UnitType
+from openglassbox.agent import AgentType
+from openglassbox.resources import Resources
 
 
 def test_constructors():

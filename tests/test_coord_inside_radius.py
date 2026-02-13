@@ -15,7 +15,7 @@ and edge cases of the original C++ simulation engine.
 
 import pytest
 import random
-from src.map_coordinates_inside_radius import MapCoordinatesInsideRadius
+from openglassbox.map_coordinates_inside_radius import MapCoordinatesInsideRadius
 
 # Use a fixed seed for reproducible tests
 random.seed(42)

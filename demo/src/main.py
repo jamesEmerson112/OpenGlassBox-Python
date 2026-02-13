@@ -22,19 +22,11 @@ def main():
         print("🐛 Debug mode enabled - agent debug logging activated")
 
     # Set up paths
-    # 1. Add the current directory (demo/src) to path for local imports
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    if script_dir not in sys.path:
-        sys.path.insert(0, script_dir)
 
-    # 2. Add the project root to path for src package imports
-    python_root = os.path.abspath(os.path.join(script_dir, '../../'))
-    if python_root not in sys.path:
-        sys.path.insert(0, python_root)
-
-    # Import the demo using direct import (not package import)
+    # Import the demo using relative import
     print("Starting OpenGlassBox Demo...")
-    from demo import GlassBoxDemo
+    from .demo import GlassBoxDemo
 
     # Create the demo object
     demo = GlassBoxDemo(1024, 768, "OpenGlassBox Simulation")

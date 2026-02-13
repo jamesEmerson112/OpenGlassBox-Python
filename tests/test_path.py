@@ -15,9 +15,9 @@ set up and that their behavior matches expectations from the original C++ simula
 
 import pytest
 import math
-from src.path import Path, Way, PathType, WayType
-from src.vector import Vector3D as Vector3f
-from src.node import Node
+from openglassbox.path import Path, Way, PathType, WayType
+from openglassbox.vector import Vector3D as Vector3f
+from openglassbox.node import Node
 
 
 # Mock classes for testing

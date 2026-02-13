@@ -9,10 +9,10 @@ from unittest.mock import Mock, patch, MagicMock
 import pygame
 from typing import List, Dict
 
-import debug_ui DebugUI
-from simulation import Simulation
-from city import City
-from vector import Vector3f
+from demo.src.Display.debug_ui import DebugUI
+from openglassbox.simulation import Simulation
+from openglassbox.city import City
+from openglassbox.vector import Vector3f
 
 
 class TestDebugUI(unittest.TestCase):
@@ -288,9 +288,9 @@ class TestDebugUIIntegration(unittest.TestCase):
         self.simulation = Simulation(12, 12)
 
         # Create cities with paths, units, and maps
-        from .map import MapType
-        from .path import PathType, WayType
-        from .unit import UnitType
+        from openglassbox.map import MapType
+        from openglassbox.path import PathType, WayType
+        from openglassbox.unit import UnitType
 
         # Create types
         self.grass_type = MapType("Grass", 0x00FF00, 100)

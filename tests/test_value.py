@@ -14,8 +14,8 @@ rule evaluation, and resource management within the OpenGlassBox engine.
 import pytest
 import math
 
-from src.resource import Resource
-from src.rule_value import IRuleValue as RuleValueGlobal, RuleValueLocal, RuleValueMap
+from openglassbox.resource import Resource
+from openglassbox.rule_value import IRuleValue as RuleValueGlobal, RuleValueLocal, RuleValueMap
 
 
 # Mock RuleContext for testing since it may not be fully implemented

@@ -11,17 +11,13 @@ import gc
 import tracemalloc
 import statistics
 from typing import List, Dict, Tuple, Any
-import os
 import sys
 
-# Add the parent directory to the path for imports
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from src.simulation import Simulation
-from src.vector import Vector3f
-from src.map import MapType
-from src.path import PathType, WayType
-from src.unit import UnitType
+from openglassbox.simulation import Simulation
+from openglassbox.vector import Vector3f
+from openglassbox.map import MapType
+from openglassbox.path import PathType, WayType
+from openglassbox.unit import UnitType
 import pygame
 
 
@@ -284,7 +280,7 @@ class PerformanceBenchmarks(unittest.TestCase):
         surface = pygame.Surface((800, 600))
 
         # Import demo after pygame init
-        from demo import GlassBoxDemo
+        from demo.src.demo import GlassBoxDemo
 
         demo = GlassBoxDemo(800, 600, "Performance Test")
 

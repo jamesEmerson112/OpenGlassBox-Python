@@ -178,8 +178,9 @@ cd openglassbox/python
 # Install with development dependencies
 make install-dev
 
-# Or install with pip
-pip install -r requirements.txt
+# Or set up with conda
+conda env create -f environment.yml
+conda activate openglassbox
 ```
 
 ### Running the Demos
@@ -187,11 +188,7 @@ pip install -r requirements.txt
 ```bash
 # Run the basic demo (matches C++ demo exactly)
 make run-demo
-# or: python -m demo
-
-# Run the enhanced demo with debug UI
-make run-enhanced
-# or: python -m demo_enhanced
+# or: python -m demo.src.main
 ```
 
 ### Demo Controls
@@ -246,43 +243,44 @@ The enhanced demo includes a comprehensive debug interface:
 ### Project Structure
 
 ```
-python/
-├── Core Components
+OpenGlassBox-Python/
+├── openglassbox/           # Core simulation engine package
+│   ├── __init__.py         # Package init with key re-exports
 │   ├── simulation.py       # Main simulation engine
-│   ├── city.py            # City management
-│   ├── agent.py           # Autonomous agents
-│   ├── map.py             # Resource maps
-│   ├── path.py            # Path networks
-│   ├── unit.py            # Units on paths
-│   ├── dijkstra.py        # Pathfinding algorithms
-│   ├── script_parser.py   # Configuration parsing
-│   ├── rule.py            # Rule system
-│   └── vector.py          # 3D vector math
+│   ├── city.py             # City management
+│   ├── agent.py            # Autonomous agents
+│   ├── map.py              # Resource maps
+│   ├── path.py             # Path networks
+│   ├── unit.py             # Units on paths
+│   ├── dijkstra.py         # Pathfinding algorithms
+│   ├── script_parser.py    # Configuration parsing
+│   ├── rule.py             # Rule system
+│   └── vector.py           # 3D vector math
 │
-├── Demo Applications
-│   ├── demo.py            # Basic demo (matches C++)
-│   ├── demo_enhanced.py   # Enhanced demo with debug UI
-│   ├── debug_ui.py        # Dear ImGui-equivalent debug system
-│   └── run_demo.py        # Demo launcher
+├── demo/                   # Demo applications
+│   ├── src/
+│   │   ├── demo.py         # Basic demo (matches C++)
+│   │   ├── main.py         # Demo entry point
+│   │   ├── ui_renderer.py  # Rendering module
+│   │   └── Display/        # Debug UI system
+│   └── data/               # Simulation data files
 │
-├── Testing
-│   ├── tests/             # Comprehensive test suite
-│   │   ├── test_*.py      # Component-specific tests
-│   │   ├── test_debug_ui.py           # Debug UI tests
-│   │   ├── test_demo_integration.py   # Integration tests
-│   │   └── test_performance_benchmarks.py  # Performance tests
-│   └── data/simulations/  # Test data files
+├── tests/                  # Comprehensive test suite
+│   ├── conftest.py         # Centralized test config
+│   └── test_*.py           # Component-specific tests
 │
-├── Packaging
-│   ├── pyproject.toml     # Modern Python packaging
-│   ├── requirements.txt   # Dependencies
-│   ├── setup.py          # Backwards compatibility
-│   ├── MANIFEST.in       # Distribution files
-│   └── Makefile          # Development automation
+├── scripts/debug/          # Debug and diagnostic scripts
 │
-└── Documentation
-    ├── README.md          # This file
-    └── NEXT_COMPONENTS_TO_PORT.md  # Porting status
+├── docs/                   # Documentation
+│   ├── DEVELOPER_GUIDE.md
+│   ├── DSL_SPEC.md
+│   └── diary/              # Development diary
+│
+├── pyproject.toml          # Modern Python packaging
+├── environment.yml         # Conda environment
+├── setup.py                # Backwards compatibility
+├── MANIFEST.in             # Distribution files
+└── Makefile                # Development automation
 ```
 
 ### Testing Framework
@@ -404,11 +402,11 @@ The Python version achieves excellent performance for an interpreted language im
 ### Creating a Custom Simulation
 
 ```python
-from simulation import Simulation
-from vector import Vector3f
-from map import MapType
-from path import PathType, WayType
-from unit import UnitType
+from openglassbox.simulation import Simulation
+from openglassbox.vector import Vector3f
+from openglassbox.map import MapType
+from openglassbox.path import PathType, WayType
+from openglassbox.unit import UnitType
 
 # Create simulation
 sim = Simulation(16, 16)
@@ -458,8 +456,8 @@ for step in range(100):
 
 ```python
 import pygame
-from debug_ui import DebugUI
-from simulation import Simulation
+from demo.src.Display.debug_ui import DebugUI
+from openglassbox.simulation import Simulation
 
 pygame.init()
 screen = pygame.display.set_mode((800, 600))

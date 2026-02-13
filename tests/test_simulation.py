@@ -13,9 +13,9 @@ matching the requirements for simulation setup, city registration, and update lo
 
 import pytest
 
-from src.simulation import Simulation, TICKS_PER_SECOND
-from src.vector import Vector3f
-from src.city import City
+from openglassbox.simulation import Simulation, TICKS_PER_SECOND
+from openglassbox.vector import Vector3f
+from openglassbox.city import City
 
 def test_constants():
     """Test that simulation constants are properly defined."""

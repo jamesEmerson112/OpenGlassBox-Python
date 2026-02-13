@@ -13,8 +13,8 @@ providing efficient storage and manipulation of Resource collections.
 
 import pytest
 
-from src.resource import Resource
-from src.resources import Resources
+from openglassbox.resource import Resource
+from openglassbox.resources import Resources
 
 def test_constructor():
     """Test Resources container construction and basic operations."""

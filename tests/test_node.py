@@ -10,8 +10,8 @@ This file covers:
 """
 
 import pytest
-from src.node import Node
-from src.vector import Vector3D as Vector3f
+from openglassbox.node import Node
+from openglassbox.vector import Vector3D as Vector3f
 
 
 class TestNode:

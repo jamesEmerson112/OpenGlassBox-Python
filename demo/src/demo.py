@@ -12,21 +12,15 @@ import time
 import pygame
 from typing import Dict, List, Optional, Tuple
 
-# Set up paths - add the main python directory to sys.path
-script_dir = os.path.dirname(os.path.abspath(__file__))
-python_root = os.path.abspath(os.path.join(script_dir, '../../'))
-if python_root not in sys.path:
-    sys.path.insert(0, python_root)
+# Import from the openglassbox package
+from openglassbox.simulation import Simulation
+from openglassbox.city import City
+from openglassbox.script_parser import Script
 
-# Import from the src package
-from src.simulation import Simulation
-from src.city import City
-from src.script_parser import Script
-
-# Import our modules using direct imports
-from ui_renderer import UIRenderer
-from city_setup import CitySetup
-from input_handler import InputHandler
+# Import our modules using relative imports
+from .ui_renderer import UIRenderer
+from .city_setup import CitySetup
+from .input_handler import InputHandler
 
 class GlassBoxDemo:
     """
@@ -225,6 +219,7 @@ def main():
     demo = GlassBoxDemo(800, 600, "OpenGlassBox Simulation Demo")
 
     # Try to load TestCity scenario using absolute path
+    script_dir = os.path.dirname(os.path.abspath(__file__))
     simfile = os.path.abspath(os.path.join(script_dir, "../data/Simulations/TestCity.txt"))
     if os.path.exists(simfile):
         print(f"Loading scenario: {simfile}")

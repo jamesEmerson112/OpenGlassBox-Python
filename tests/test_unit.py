@@ -16,12 +16,12 @@ behave as expected, matching the simulation's requirements for unit interactions
 import pytest
 from unittest.mock import Mock, call
 
-from src.vector import Vector3D as Vector3f
-from src.node import Node
-from src.resources import Resources
-from src.resource import Resource
-from src.unit import UnitType, Unit
-from src.city import City
+from openglassbox.vector import Vector3D as Vector3f
+from openglassbox.node import Node
+from openglassbox.resources import Resources
+from openglassbox.resource import Resource
+from openglassbox.unit import UnitType, Unit
+from openglassbox.city import City
 
 
 # Mock classes for testing rule execution

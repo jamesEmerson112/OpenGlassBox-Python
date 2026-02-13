@@ -10,10 +10,10 @@ The tests ensure that command objects are correctly set up and that their initia
 """
 
 import pytest
-from src.rule_command import RuleCommandAdd, RuleCommandRemove, RuleCommandTest, RuleCommandAgent
-from src.rule_value import IRuleValue as RuleValue
-from src.agent import AgentType
-from src.resources import Resources
+from openglassbox.rule_command import RuleCommandAdd, RuleCommandRemove, RuleCommandTest, RuleCommandAgent
+from openglassbox.rule_value import IRuleValue as RuleValue
+from openglassbox.agent import AgentType
+from openglassbox.resources import Resources
 
 
 class MockIRuleValue:

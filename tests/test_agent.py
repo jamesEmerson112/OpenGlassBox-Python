@@ -12,13 +12,13 @@ are properly initialized and structured.
 """
 
 import pytest
-from src.vector import Vector3f
-from src.node import Node
-from src.unit import UnitType, Unit
-from src.resources import Resources
-from src.agent import AgentType, Agent
-from src.path import PathType, WayType, Path
-from src.city import City
+from openglassbox.vector import Vector3f
+from openglassbox.node import Node
+from openglassbox.unit import UnitType, Unit
+from openglassbox.resources import Resources
+from openglassbox.agent import AgentType, Agent
+from openglassbox.path import PathType, WayType, Path
+from openglassbox.city import City
 
 
 def test_constructor():

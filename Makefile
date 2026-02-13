@@ -51,10 +51,10 @@ test:
 	python -m pytest tests/ -v
 
 test-coverage:
-	python -m pytest tests/ -v --cov=. --cov-report=term-missing --cov-report=html
+	python -m pytest tests/ -v --cov=openglassbox --cov-report=term-missing --cov-report=html
 
 test-all:
-	python -m pytest tests/ -v --cov=. --cov-report=term-missing --cov-report=html --runslow
+	python -m pytest tests/ -v --cov=openglassbox --cov-report=term-missing --cov-report=html --runslow
 
 test-debug:
 	python -m pytest tests/test_debug_ui.py -v
@@ -111,20 +111,18 @@ docs-serve:
 
 # Demo targets
 run-demo:
-	python -m demo
+	python -m demo.src.main
 
 run-enhanced:
-	python -m demo_enhanced
+	@echo "Enhanced demo not yet available as a separate entry point."
+	@echo "Use: python -m demo.src.main"
 
 # Development environment setup
 dev-setup:
-	python -m venv venv
-	./venv/bin/pip install --upgrade pip
-	./venv/bin/pip install -e ".[dev]"
+	conda env create -f environment.yml
 	@echo ""
 	@echo "Development environment created!"
-	@echo "Activate with: source venv/bin/activate"
-	@echo "Or on Windows: venv\\Scripts\\activate"
+	@echo "Activate with: conda activate openglassbox"
 
 # Check dependencies
 check-deps:
