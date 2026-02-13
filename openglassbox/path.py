@@ -11,6 +11,7 @@ from dataclasses import dataclass, field
 import math
 
 from .vector import Vector3f
+from .node import Node
 
 
 @dataclass
@@ -29,150 +30,6 @@ class PathType:
     """
     name: str
     color: int = 0xFFFFFF
-
-
-class Node:
-    """
-    Node class representing vertices in the path graph.
-
-    Nodes define connection points in the transportation network.
-    They store their position in the world, track connected Ways,
-    and may have Units attached to them.
-    """
-
-    def __init__(self, node_id: int, position: Vector3f):
-        """
-        Initialize a node with ID and position.
-
-        Args:
-            node_id: Unique identifier for this node
-            position: The node's position in world space
-        """
-        self.m_id = node_id
-        self.m_position = position
-        self.m_ways: List['Way'] = []
-        self.m_units: List[Any] = []  # Will be populated with references to Unit instances
-
-    def add_unit(self, unit: Any) -> None:
-        """
-        Attach a Unit to this node.
-
-        Args:
-            unit: The Unit to attach to this node
-        """
-        self.m_units.append(unit)
-
-    def translate(self, direction: Vector3f) -> None:
-        """
-        Move the node by the specified direction vector.
-
-        Args:
-            direction: Vector representing the direction and magnitude of movement
-        """
-        self.m_position += direction
-        # Update magnitude of all connected ways
-        for way in self.m_ways:
-            way.update_magnitude()
-
-    def get_way_to_node(self, other_node: 'Node') -> Optional['Way']:
-        """
-        Find a way connecting this node to another specified node.
-
-        Args:
-            other_node: The node to find a connection to
-
-        Returns:
-            The Way object connecting the nodes, or None if no connection exists
-        """
-        for way in self.m_ways:
-            if (way.m_from is other_node and way.m_to is self) or \
-               (way.m_to is other_node and way.m_from is self):
-                return way
-        return None
-
-    def has_ways(self) -> bool:
-        """
-        Check if this node has any ways connected to it.
-
-        Returns:
-            True if the node has at least one connected Way, False otherwise
-        """
-        return len(self.m_ways) > 0
-
-    def get_map_position(self, grid_size_u: int, grid_size_v: int, u: int, v: int) -> Tuple[int, int]:
-        """
-        Convert world position to map coordinates.
-
-        Args:
-            grid_size_u: The grid size in the U direction
-            grid_size_v: The grid size in the V direction
-            u: Output parameter for U coordinate
-            v: Output parameter for V coordinate
-
-        Returns:
-            Tuple of (u, v) map coordinates
-        """
-        # This version returns calculated values directly rather than using output parameters
-        # In real implementation, this would map from world to grid coordinates
-        return u, v
-
-    def id(self) -> int:
-        """
-        Get the node's unique identifier.
-
-        Returns:
-            The node's ID
-        """
-        return self.m_id
-
-    def position(self) -> Vector3f:
-        """
-        Get the node's position in world space.
-
-        Returns:
-            The node's position as a Vector3f
-        """
-        return self.m_position
-
-    def ways(self) -> List['Way']:
-        """
-        Get the list of ways connected to this node.
-
-        Returns:
-            List of connected Way objects
-        """
-        return self.m_ways
-
-    def units(self) -> List[Any]:
-        """
-        Get the list of units attached to this node.
-
-        Returns:
-            List of attached Unit objects
-        """
-        return self.m_units
-
-    def unit(self, index: int) -> Any:
-        """
-        Get a specific unit by index.
-
-        Args:
-            index: The index of the unit to retrieve
-
-        Returns:
-            The Unit at the specified index
-        """
-        return self.m_units[index]
-
-    @staticmethod
-    def color() -> int:
-        """
-        Get the global color for nodes.
-
-        Returns:
-            The color value as an integer
-        """
-        return 0xAAAAAA
 
 
 class Way:
@@ -426,3 +283,12 @@ class Path:
             List of Way objects
         """
         return self.m_ways
+
+    # camelCase aliases for C++ API compatibility
+    def addNode(self, position: Vector3f) -> Node:
+        """Alias for add_node() for C++ API compatibility."""
+        return self.add_node(position)
+
+    def addWay(self, way_type: WayType, node1: Node, node2: Node) -> Way:
+        """Alias for add_way() for C++ API compatibility."""
+        return self.add_way(way_type, node1, node2)

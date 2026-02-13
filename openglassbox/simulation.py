@@ -11,10 +11,7 @@ from abc import ABC, abstractmethod
 from .city import City
 from .vector import Vector3f
 from .script_parser import Script
-
-# Constants matching C++ #define values
-MAX_ITERATIONS_PER_UPDATE = 20
-TICKS_PER_SECOND = 200.0
+from .config import MAX_ITERATIONS_PER_UPDATE, TICKS_PER_SECOND
 
 
 class Simulation(Script):
@@ -22,7 +19,7 @@ class Simulation(Script):
     Entry point class managing a collection of Cities and running simulation on them.
     Equivalent to C++ Simulation class.
 
-    In this current phase of development Cities are not connected between them.
+    Cities can be connected by sharing Nodes/Ways across their Path networks.
     """
 
     class Listener:
@@ -181,3 +178,18 @@ class Simulation(Script):
             Dictionary mapping city names to City objects
         """
         return self.m_cities
+
+    def step(self) -> None:
+        """
+        Convenience method to advance the simulation by one step.
+        Equivalent to calling update(1.0).
+        """
+        self.update(1.0)
+
+    def sizeU(self) -> int:
+        """Get the grid size along the U-axis."""
+        return self.m_gridSizeU
+
+    def sizeV(self) -> int:
+        """Get the grid size along the V-axis."""
+        return self.m_gridSizeV

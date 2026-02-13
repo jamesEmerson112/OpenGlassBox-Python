@@ -13,6 +13,7 @@ from .vector import Vector3f
 from .map_coordinates_inside_radius import MapCoordinatesInsideRadius
 from .map_random_coordinates import MapRandomCoordinates
 from .resource import Resource
+from .rule import RuleContext
 from . import config
 
 
@@ -282,13 +283,3 @@ class Map:
         return self.m_type.capacity
 
 
-class RuleContext:
-    """Context information for rule execution."""
-    def __init__(self):
-        self.city = None
-        self.unit = None
-        self.locals = None
-        self.globals = None
-        self.u = 0
-        self.v = 0
-        self.radius = 0
