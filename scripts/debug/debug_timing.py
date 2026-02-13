@@ -6,13 +6,14 @@ Debug script to test timing and tick calculation.
 import sys
 import os
 
-# Add the main python directory to sys.path
+# Add project root to sys.path for imports
 script_dir = os.path.dirname(os.path.abspath(__file__))
-if script_dir not in sys.path:
-    sys.path.insert(0, script_dir)
+project_root = os.path.abspath(os.path.join(script_dir, '..', '..'))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
 
-from src.simulation import Simulation, TICKS_PER_SECOND
-from src.vector import Vector3f
+from openglassbox.simulation import Simulation, TICKS_PER_SECOND
+from openglassbox.vector import Vector3f
 
 def debug_timing():
     """Debug timing and tick calculation."""
@@ -20,7 +21,7 @@ def debug_timing():
     
     # Create simulation
     simulation = Simulation(12, 12)
-    simfile = "demo/data/Simulations/TestCity.txt"
+    simfile = os.path.join(project_root, "demo", "data", "Simulations", "TestCity.txt")
     
     if not simulation.parse(simfile):
         print(f"FAILED to parse {simfile}")

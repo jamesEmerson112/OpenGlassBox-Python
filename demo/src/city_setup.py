@@ -4,8 +4,8 @@ City Setup module for OpenGlassBox demo.
 This module handles initialization of demo cities and simulation setup.
 """
 
-from src.simulation import Simulation
-from src.vector import Vector3f
+from openglassbox.simulation import Simulation
+from openglassbox.vector import Vector3f
 
 class CitySetup:
     """Handles setting up demo cities for the simulation."""

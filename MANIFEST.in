@@ -1,12 +1,12 @@
 # Include important files in the source distribution
 include README.md
 include LICENSE
-include requirements.txt
+include environment.yml
 include pyproject.toml
 include MANIFEST.in
 
 # Include data files
-recursive-include data *.txt *.png *.ttf
+recursive-include demo/data *.txt *.png *.ttf
 
 # Include documentation
 recursive-include docs *.md *.rst *.py

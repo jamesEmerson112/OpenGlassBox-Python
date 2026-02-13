@@ -1,4 +1,4 @@
-from src.script_parser import Script
+from openglassbox.script_parser import Script
 
 def main():
     simfile = "demo/data/Simulations/TestCity.txt"

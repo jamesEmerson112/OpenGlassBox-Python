@@ -12,21 +12,15 @@ import time
 import pygame
 from typing import Dict, List, Optional, Tuple
 
-# Set up paths - add the main python directory to sys.path
-script_dir = os.path.dirname(os.path.abspath(__file__))
-python_root = os.path.abspath(os.path.join(script_dir, '../../'))
-if python_root not in sys.path:
-    sys.path.insert(0, python_root)
+# Import from the openglassbox package
+from openglassbox.simulation import Simulation
+from openglassbox.city import City
+from openglassbox.script_parser import Script
 
-# Import from the src package
-from src.simulation import Simulation
-from src.city import City
-from src.script_parser import Script
-
-# Import our modules using direct imports
-from ui_renderer import UIRenderer
-from city_setup import CitySetup
-from input_handler import InputHandler
+# Import our modules using relative imports
+from .ui_renderer import UIRenderer
+from .city_setup import CitySetup
+from .input_handler import InputHandler
 
 class GlassBoxDemo:
     """
@@ -36,7 +30,7 @@ class GlassBoxDemo:
     between the simulation engine and the UI renderer.
     """
 
-    def __init__(self, width: int = 800, height: int = 600, title: str = "OpenGlassBox Demo"):
+    def __init__(self, width: int = 800, height: int = 600, title: str = "OpenGlassBox Demo", record: bool = False):
         """Initialize the demo application."""
         pygame.init()
         self.width = width
@@ -60,6 +54,10 @@ class GlassBoxDemo:
 
         # Store simulation file for restart functionality
         self.current_simfile = None
+
+        # Recording support (recorder is set externally by main.py)
+        self.recording = record
+        self.recorder = None
 
         # Camera/view settings
         self.camera_offset_x = 0
@@ -123,6 +121,9 @@ class GlassBoxDemo:
             # The simulation.update() method should increment ticks
             # and run all the rules that move agents, update resources, etc.
             self.simulation.update(dt)
+
+            if self.recording and self.recorder is not None:
+                self.recorder.capture_tick()
 
     def render(self):
         """Render the current simulation state."""
@@ -208,6 +209,14 @@ class GlassBoxDemo:
             # Render everything to screen
             self.render()
 
+        # Save recording if enabled
+        if self.recording and self.recorder is not None:
+            output_dir = os.path.join(
+                os.path.dirname(os.path.abspath(__file__)), "../data/recordings"
+            )
+            filepath = self.recorder.save(output_dir)
+            print(f"Session recorded to {filepath}")
+
         # Clean up
         pygame.quit()
         print("Demo terminated")
@@ -225,6 +234,7 @@ def main():
     demo = GlassBoxDemo(800, 600, "OpenGlassBox Simulation Demo")
 
     # Try to load TestCity scenario using absolute path
+    script_dir = os.path.dirname(os.path.abspath(__file__))
     simfile = os.path.abspath(os.path.join(script_dir, "../data/Simulations/TestCity.txt"))
     if os.path.exists(simfile):
         print(f"Loading scenario: {simfile}")

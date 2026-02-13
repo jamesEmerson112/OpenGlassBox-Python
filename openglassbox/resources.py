@@ -249,6 +249,18 @@ class Resources:
         """
         return self.m_bin.copy()
 
+    def __len__(self) -> int:
+        """Return the number of resource types in this container."""
+        return len(self.m_bin)
+
+    def __iter__(self):
+        """Iterate over Resource objects in this container."""
+        return iter(self.m_bin)
+
+    def empty(self) -> bool:
+        """Alias for is_empty(). Return true if all resources are empty."""
+        return self.is_empty()
+
     def __str__(self) -> str:
         """
         Return a string representation of the resources.

@@ -6,37 +6,13 @@ for the simulation. A City contains Maps, Paths, Units, and Agents, and manages 
 interactions.
 """
 
-from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple, Any
-import copy
 
 from .vector import Vector3f
 from .resources import Resources
-
-
-@dataclass
-class MapType:
-    """Type definition for Maps in the simulation."""
-    name: str
-    color: int = 0xFFFFFF
-    capacity: int = 2147483647  # Resource.MAX_CAPACITY
-    rules: List = field(default_factory=list)
-
-
-@dataclass
-class PathType:
-    """Type definition for Paths in the simulation."""
-    name: str
-    color: int = 0xFFFFFF
-
-
-@dataclass
-class UnitType:
-    """Type definition for Units in the simulation."""
-    name: str
-    color: int = 0xFFFFFF
-    radius: int = 1
-    resources: Resources = field(default_factory=Resources)
+from .map import MapType
+from .path import PathType
+from .script_parser import UnitType
 
 
 class City:

@@ -1,34 +1,36 @@
 #!/usr/bin/env python3
 """
-Test the fixed TestCity scenario with sustainable economy.
+Debug script to test the complete agent lifecycle.
+This will track agents from spawn to destination and back.
 """
 
 import sys
 import os
 
-# Add the main python directory to sys.path
+# Add project root to sys.path for imports
 script_dir = os.path.dirname(os.path.abspath(__file__))
-if script_dir not in sys.path:
-    sys.path.insert(0, script_dir)
+project_root = os.path.abspath(os.path.join(script_dir, '..', '..'))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
 
-from src.simulation import Simulation
-from src.vector import Vector3f
+from openglassbox.simulation import Simulation
+from openglassbox.vector import Vector3f
 
-def test_fixed_scenario():
-    """Test the fixed scenario with sustainable economy."""
-    print("=== Testing Fixed TestCity Scenario ===")
+def debug_agent_lifecycle():
+    """Debug the complete agent lifecycle over many ticks."""
+    print("=== Debugging Complete Agent Lifecycle ===")
     
     # Create simulation
     simulation = Simulation(12, 12)
     
-    # Parse the FIXED TestCity.txt file
-    simfile = "demo/data/Simulations/TestCityFixed.txt"
-    print(f"\n1. Parsing fixed simulation file: {simfile}")
+    # Parse the TestCity.txt file
+    simfile = os.path.join(project_root, "demo", "data", "Simulations", "TestCity.txt")
+    print(f"\n1. Parsing simulation file: {simfile}")
     if not simulation.parse(simfile):
         print(f"FAILED to parse {simfile}")
         return False
     
-    # Create a test city
+    # Create a test city with simplified setup
     print(f"\n2. Creating test city...")
     paris = simulation.add_city("Paris", Vector3f(400.0, 200.0, 0.0))
     
@@ -55,28 +57,20 @@ def test_fixed_scenario():
     work_unit = paris.add_unit_on_way(work_type, road, w1, 0.9)  # Near end
     
     print(f"✓ Created city with {len(paris.units())} units")
-    
-    # Check the rules in the fixed version
-    print(f"\n3. Examining fixed rules:")
-    print(f"   Home unit rules: {len(home_type.rules)}")
-    for i, rule in enumerate(home_type.rules):
-        print(f"     - Rule {i}: '{rule.type()}' rate={rule.rate()}")
-    
-    print(f"   Work unit rules: {len(work_type.rules)}")
-    for i, rule in enumerate(work_type.rules):
-        print(f"     - Rule {i}: '{rule.type()}' rate={rule.rate()}")
+    print(f"  - Home unit at position: {home_unit.position()}")
+    print(f"  - Work unit at position: {work_unit.position()}")
     
     # Initialize water in the map (for the SendPeopleToHome condition)
-    print(f"\n4. Initializing water resources...")
+    print(f"\n3. Initializing water resources...")
     for u in range(paris_water.grid_size_u()):
         for v in range(paris_water.grid_size_v()):
             paris_water.add_resource(u, v, 80)  # Set water > 70
     print(f"✓ Set water levels to 80 (above the required 70)")
     
-    # Track state over many ticks to see if it's sustainable
-    print(f"\n5. Simulating over 300 ticks to test sustainability...")
+    # Track state over many ticks
+    print(f"\n4. Simulating over 200 ticks...")
     
-    for tick in range(300):
+    for tick in range(200):
         # Record state before update
         home_people = sum(res.get_amount() for res in home_unit.resources().container() if res.type() == "People")
         work_people = sum(res.get_amount() for res in work_unit.resources().container() if res.type() == "People")
@@ -90,14 +84,13 @@ def test_fixed_scenario():
         new_work_people = sum(res.get_amount() for res in work_unit.resources().container() if res.type() == "People")
         new_num_agents = len(paris.agents())
         
-        # Report changes and periodic status
+        # Report changes
         if (home_people != new_home_people or 
             work_people != new_work_people or 
             num_agents != new_num_agents or 
-            tick % 50 == 0):  # Report every 50 ticks
+            tick % 20 == 0):  # Also report every 20 ticks
             
-            sim_tick = simulation.get_total_ticks()
-            print(f"Tick {sim_tick:3d}: Home People: {new_home_people}, Work People: {new_work_people}, Agents: {new_num_agents}")
+            print(f"Tick {simulation.get_total_ticks():3d}: Home People: {new_home_people}, Work People: {new_work_people}, Agents: {new_num_agents}")
             
             if num_agents != new_num_agents:
                 if new_num_agents > num_agents:
@@ -116,22 +109,14 @@ def test_fixed_scenario():
                     print(f"    → Work lost People ({work_people} -> {new_work_people})")
                 else:
                     print(f"    → Work gained People ({work_people} -> {new_work_people})")
-    
-    # Final summary
-    final_home = sum(res.get_amount() for res in home_unit.resources().container() if res.type() == "People")
-    final_work = sum(res.get_amount() for res in work_unit.resources().container() if res.type() == "People")
-    final_agents = len(paris.agents())
-    
-    print(f"\n6. Final State Summary:")
-    print(f"   - Home People: {final_home}")
-    print(f"   - Work People: {final_work}")
-    print(f"   - Active Agents: {final_agents}")
-    print(f"   - Total People in system: {final_home + final_work + final_agents}")
-    
-    if final_home + final_work + final_agents > 0:
-        print("✓ SUCCESS: Economy is sustainable - People are still in the system!")
-    else:
-        print("✗ FAILURE: Economy collapsed - all People depleted!")
+            
+            # Check water levels
+            total_water = sum(paris_water.get_resource(u, v) 
+                            for u in range(paris_water.grid_size_u()) 
+                            for v in range(paris_water.grid_size_v()))
+            avg_water = total_water / (paris_water.grid_size_u() * paris_water.grid_size_v())
+            if tick % 40 == 0:  # Report water every 40 ticks
+                print(f"    → Average water level: {avg_water:.1f}")
 
 if __name__ == "__main__":
-    test_fixed_scenario()
+    debug_agent_lifecycle()

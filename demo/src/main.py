@@ -14,6 +14,8 @@ def main():
     parser = argparse.ArgumentParser(description='OpenGlassBox Simulation Demo')
     parser.add_argument('--debug', action='store_true',
                         help='Enable debug logging for agents and other components')
+    parser.add_argument('--no-record', action='store_true',
+                        help='Disable recording simulation state to a JSON file')
     args = parser.parse_args()
 
     # Set global debug flag
@@ -22,22 +24,15 @@ def main():
         print("🐛 Debug mode enabled - agent debug logging activated")
 
     # Set up paths
-    # 1. Add the current directory (demo/src) to path for local imports
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    if script_dir not in sys.path:
-        sys.path.insert(0, script_dir)
 
-    # 2. Add the project root to path for src package imports
-    python_root = os.path.abspath(os.path.join(script_dir, '../../'))
-    if python_root not in sys.path:
-        sys.path.insert(0, python_root)
-
-    # Import the demo using direct import (not package import)
+    # Import the demo using relative import
     print("Starting OpenGlassBox Demo...")
-    from demo import GlassBoxDemo
+    from .demo import GlassBoxDemo
 
     # Create the demo object
-    demo = GlassBoxDemo(1024, 768, "OpenGlassBox Simulation")
+    record = not args.no_record
+    demo = GlassBoxDemo(1024, 768, "OpenGlassBox Simulation", record=record)
 
     # Try to initialize with TestCity.txt using absolute path
     simfile = os.path.abspath(os.path.join(script_dir, "../data/Simulations/TestCity.txt"))
@@ -46,6 +41,13 @@ def main():
         print(f"Failed to initialize simulation with {simfile}")
         print("Exiting (no fallback to hardcoded setup).")
         sys.exit(1)
+
+    # Set up recording after cities are initialised
+    if record:
+        from .session_recorder import SessionRecorder
+        demo.recorder = SessionRecorder(demo.simulation, simfile)
+        demo.recorder.attach_to_cities()
+        print("Recording enabled - session will be saved on exit")
 
     # Run the demo
     demo.run()
