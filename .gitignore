@@ -83,3 +83,9 @@ Desktop.ini
 # Misc
 *.swp
 *~
+
+# System design visualization (local-only, detailed architecture diagrams)
+.system-design-visualization
+
+# Session recordings (generated data)
+demo/data/recordings/

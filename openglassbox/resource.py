@@ -24,15 +24,16 @@ class Resource:
     # Maximum possible capacity (equivalent to uint32_t max in C++)
     MAX_CAPACITY: int = 2**32 - 1
 
-    def __init__(self, resource_type: str):
+    def __init__(self, resource_type: str, capacity: int = None):
         """
-        Initialize a resource with zero amount but maximum capacity.
+        Initialize a resource with zero amount and optional capacity.
 
         Args:
             resource_type: The type of resource (e.g., "water", "oil", "electricity")
+            capacity: Optional capacity (defaults to MAX_CAPACITY if not specified)
         """
         self.m_type: str = resource_type
-        self.m_capacity: int = Resource.MAX_CAPACITY
+        self.m_capacity: int = capacity if capacity is not None else Resource.MAX_CAPACITY
         self.m_amount: int = 0
 
     def add(self, to_add: int) -> None:

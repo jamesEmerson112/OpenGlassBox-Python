@@ -47,10 +47,10 @@ def test_listener():
             self.added_cities = []
             self.removed_cities = []
 
-        def on_city_added(self, city):
+        def onCityAdded(self, city):
             self.added_cities.append(city)
 
-        def on_city_removed(self, city):
+        def onCityRemoved(self, city):
             self.removed_cities.append(city)
 
     listener = TestListener()

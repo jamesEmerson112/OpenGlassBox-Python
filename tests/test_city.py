@@ -30,8 +30,8 @@ def test_constructors():
     assert city.position().x == 0.0
     assert city.position().y == 0.0
     assert city.position().z == 0.0
-    assert city.gridSizeU() == GRILL
-    assert city.gridSizeV() == GRILL + 1
+    assert city.grid_size_u() == GRILL
+    assert city.grid_size_v() == GRILL + 1
 
     # Test construction with position and grid size
     city2 = City("Marseille", Vector3f(1.0, 2.0, 3.0), GRILL, GRILL)
@@ -39,8 +39,8 @@ def test_constructors():
     assert int(city2.position().x) == 1
     assert int(city2.position().y) == 2
     assert int(city2.position().z) == 3
-    assert city2.gridSizeU() == GRILL
-    assert city2.gridSizeV() == GRILL
+    assert city2.grid_size_u() == GRILL
+    assert city2.grid_size_v() == GRILL
 
     # Test default construction
     city3 = City("Lyon")
@@ -48,8 +48,8 @@ def test_constructors():
     assert city3.position().x == 0.0
     assert city3.position().y == 0.0
     assert city3.position().z == 0.0
-    assert city3.gridSizeU() == 32  # Default size
-    assert city3.gridSizeV() == 32  # Default size
+    assert city3.grid_size_u() == 32  # Default size
+    assert city3.grid_size_v() == 32  # Default size
 
 
 def test_grid_position():

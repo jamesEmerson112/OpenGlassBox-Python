@@ -21,9 +21,9 @@ def test_constructor():
     assert oil.m_type == "oil"
     assert oil.m_amount == 0
     assert oil.m_capacity == Resource.MAX_CAPACITY
-    assert oil.getAmount() == 0
-    assert oil.hasAmount() is False
-    assert oil.getCapacity() == Resource.MAX_CAPACITY
+    assert oil.get_amount() == 0
+    assert oil.has_amount() is False
+    assert oil.get_capacity() == Resource.MAX_CAPACITY
     assert oil.type() == "oil"
 
 def test_add_amount():
@@ -33,101 +33,101 @@ def test_add_amount():
 
     oil.add(32)
     assert oil.m_amount == 32
-    assert oil.getAmount() == 32
-    assert oil.hasAmount() is True
+    assert oil.get_amount() == 32
+    assert oil.has_amount() is True
 
     oil.add(32)
     assert oil.m_amount == 64
-    assert oil.getAmount() == 64
-    assert oil.hasAmount() is True
+    assert oil.get_amount() == 64
+    assert oil.has_amount() is True
 
-    oil.setCapacity(32)
+    oil.set_capacity(32)
     assert oil.m_capacity == 32
-    assert oil.getCapacity() == 32
+    assert oil.get_capacity() == 32
     assert oil.m_amount == 32
-    assert oil.getAmount() == 32
-    assert oil.hasAmount() is True
+    assert oil.get_amount() == 32
+    assert oil.has_amount() is True
 
     oil.add(32)
     assert oil.m_capacity == 32
-    assert oil.getCapacity() == 32
+    assert oil.get_capacity() == 32
     assert oil.m_amount == 32
-    assert oil.getAmount() == 32
-    assert oil.hasAmount() is True
+    assert oil.get_amount() == 32
+    assert oil.has_amount() is True
 
-    oil.setCapacity(0)
+    oil.set_capacity(0)
     assert oil.m_capacity == 0
-    assert oil.getCapacity() == 0
+    assert oil.get_capacity() == 0
     assert oil.m_amount == 0
-    assert oil.getAmount() == 0
-    assert oil.hasAmount() is False
+    assert oil.get_amount() == 0
+    assert oil.has_amount() is False
 
 def test_add_amount_pathological_case():
     oil = Resource("oil")
     oil.add(32)
-    assert oil.getAmount() == 32
-    assert oil.hasAmount() is True
+    assert oil.get_amount() == 32
+    assert oil.has_amount() is True
 
     oil.add(Resource.MAX_CAPACITY)
-    assert oil.getAmount() == Resource.MAX_CAPACITY
-    assert oil.hasAmount() is True
+    assert oil.get_amount() == Resource.MAX_CAPACITY
+    assert oil.has_amount() is True
 
     oil.m_amount = 32
-    oil.setCapacity(32)
+    oil.set_capacity(32)
     oil.add(Resource.MAX_CAPACITY)
-    assert oil.getAmount() == 32
-    assert oil.hasAmount() is True
+    assert oil.get_amount() == 32
+    assert oil.has_amount() is True
 
 def test_remove_amount():
     oil = Resource("oil")
     oil.add(32)
-    assert oil.getAmount() == 32
-    assert oil.hasAmount() is True
+    assert oil.get_amount() == 32
+    assert oil.has_amount() is True
 
     oil.remove(16)
-    assert oil.getAmount() == 16
-    assert oil.hasAmount() is True
+    assert oil.get_amount() == 16
+    assert oil.has_amount() is True
 
     oil.remove(18)
-    assert oil.getAmount() == 0
-    assert oil.hasAmount() is False
+    assert oil.get_amount() == 0
+    assert oil.has_amount() is False
 
 def test_transfert():
     oil = Resource("oil")
     gaz = Resource("gaz")
 
-    assert oil.getAmount() == 0
-    assert oil.getCapacity() == Resource.MAX_CAPACITY
-    assert gaz.getAmount() == 0
-    assert gaz.getCapacity() == Resource.MAX_CAPACITY
+    assert oil.get_amount() == 0
+    assert oil.get_capacity() == Resource.MAX_CAPACITY
+    assert gaz.get_amount() == 0
+    assert gaz.get_capacity() == Resource.MAX_CAPACITY
 
     oil.add(32)
-    assert oil.getAmount() == 32
-    assert oil.getCapacity() == Resource.MAX_CAPACITY
+    assert oil.get_amount() == 32
+    assert oil.get_capacity() == Resource.MAX_CAPACITY
 
-    oil.transferTo(gaz)
-    assert oil.getAmount() == 0
-    assert oil.getCapacity() == Resource.MAX_CAPACITY
-    assert gaz.getAmount() == 32
-    assert gaz.getCapacity() == Resource.MAX_CAPACITY
+    oil.transfer_to(gaz)
+    assert oil.get_amount() == 0
+    assert oil.get_capacity() == Resource.MAX_CAPACITY
+    assert gaz.get_amount() == 32
+    assert gaz.get_capacity() == Resource.MAX_CAPACITY
 
-    oil.transferTo(gaz)
-    assert oil.getAmount() == 0
-    assert oil.getCapacity() == Resource.MAX_CAPACITY
-    assert gaz.getAmount() == 32
-    assert gaz.getCapacity() == Resource.MAX_CAPACITY
+    oil.transfer_to(gaz)
+    assert oil.get_amount() == 0
+    assert oil.get_capacity() == Resource.MAX_CAPACITY
+    assert gaz.get_amount() == 32
+    assert gaz.get_capacity() == Resource.MAX_CAPACITY
 
     oil.add(32)
-    gaz.setCapacity(16)
-    assert oil.getAmount() == 32
-    assert oil.getCapacity() == Resource.MAX_CAPACITY
-    assert gaz.getAmount() == 16
-    assert gaz.getCapacity() == 16
+    gaz.set_capacity(16)
+    assert oil.get_amount() == 32
+    assert oil.get_capacity() == Resource.MAX_CAPACITY
+    assert gaz.get_amount() == 16
+    assert gaz.get_capacity() == 16
 
     gaz.remove(1)
-    assert gaz.getAmount() == 15
-    assert gaz.getCapacity() == 16
-    oil.transferTo(gaz)
-    assert oil.getAmount() == 31
-    assert gaz.getAmount() == 16
-    assert gaz.getCapacity() == 16
+    assert gaz.get_amount() == 15
+    assert gaz.get_capacity() == 16
+    oil.transfer_to(gaz)
+    assert oil.get_amount() == 31
+    assert gaz.get_amount() == 16
+    assert gaz.get_capacity() == 16

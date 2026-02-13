@@ -14,6 +14,8 @@ def main():
     parser = argparse.ArgumentParser(description='OpenGlassBox Simulation Demo')
     parser.add_argument('--debug', action='store_true',
                         help='Enable debug logging for agents and other components')
+    parser.add_argument('--no-record', action='store_true',
+                        help='Disable recording simulation state to a JSON file')
     args = parser.parse_args()
 
     # Set global debug flag
@@ -29,7 +31,8 @@ def main():
     from .demo import GlassBoxDemo
 
     # Create the demo object
-    demo = GlassBoxDemo(1024, 768, "OpenGlassBox Simulation")
+    record = not args.no_record
+    demo = GlassBoxDemo(1024, 768, "OpenGlassBox Simulation", record=record)
 
     # Try to initialize with TestCity.txt using absolute path
     simfile = os.path.abspath(os.path.join(script_dir, "../data/Simulations/TestCity.txt"))
@@ -38,6 +41,13 @@ def main():
         print(f"Failed to initialize simulation with {simfile}")
         print("Exiting (no fallback to hardcoded setup).")
         sys.exit(1)
+
+    # Set up recording after cities are initialised
+    if record:
+        from .session_recorder import SessionRecorder
+        demo.recorder = SessionRecorder(demo.simulation, simfile)
+        demo.recorder.attach_to_cities()
+        print("Recording enabled - session will be saved on exit")
 
     # Run the demo
     demo.run()
