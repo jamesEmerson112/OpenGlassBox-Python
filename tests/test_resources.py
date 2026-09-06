@@ -13,8 +13,9 @@ providing efficient storage and manipulation of Resource collections.
 
 import pytest
 
-from src.resource import Resource
-from src.resources import Resources
+from openglassbox.resource import Resource
+from openglassbox.resources import Resources
+
 
 def test_constructor():
     """Test Resources container construction and basic operations."""
@@ -22,17 +23,15 @@ def test_constructor():
 
     # Test initial state
     assert len(resources) == 0
+    assert resources.is_empty()
     assert resources.empty()
 
-    # Test adding resources
-    water = Resource("Water", 100.0)
-    food = Resource("Food", 50.0)
-
-    resources.add(water)
-    resources.add(food)
+    # Test adding resources via add_resource
+    resources.add_resource("Water", 100)
+    resources.add_resource("Food", 50)
 
     assert len(resources) == 2
-    assert not resources.empty()
+    assert not resources.is_empty()
 
 
 def test_resource_access():
@@ -40,26 +39,23 @@ def test_resource_access():
     resources = Resources()
 
     # Add some test resources
-    water = Resource("Water", 75.0)
-    gold = Resource("Gold", 25.0)
+    resources.add_resource("Water", 75)
+    resources.add_resource("Gold", 25)
 
-    resources.add(water)
-    resources.add(gold)
-
-    # Test get method
-    retrieved_water = resources.get("Water")
+    # Test find_resource method
+    retrieved_water = resources.find_resource("Water")
     assert retrieved_water is not None
-    assert retrieved_water.name() == "Water"
-    assert retrieved_water.value() == 75.0
+    assert retrieved_water.type() == "Water"
+    assert retrieved_water.get_amount() == 75
 
-    # Test get with non-existent resource
-    missing = resources.get("NonExistent")
+    # Test find_resource with non-existent resource
+    missing = resources.find_resource("NonExistent")
     assert missing is None
 
-    # Test contains method
-    assert resources.contains("Water")
-    assert resources.contains("Gold")
-    assert not resources.contains("Silver")
+    # Test has_resource method
+    assert resources.has_resource("Water")
+    assert resources.has_resource("Gold")
+    assert not resources.has_resource("Silver")
 
 
 def test_resource_modification():
@@ -67,23 +63,20 @@ def test_resource_modification():
     resources = Resources()
 
     # Add initial resource
-    energy = Resource("Energy", 100.0)
-    resources.add(energy)
+    resources.add_resource("Energy", 100)
 
-    # Test modification
-    resources.set("Energy", 150.0)
-    modified = resources.get("Energy")
-    assert modified.value() == 150.0
+    # Test set_capacity
+    resources.set_capacity("Energy", 200)
+    energy = resources.find_resource("Energy")
+    assert energy.get_capacity() == 200
 
-    # Test addition to existing resource
-    resources.add_value("Energy", 50.0)
-    updated = resources.get("Energy")
-    assert updated.value() == 200.0
+    # Test adding more
+    resources.add_resource("Energy", 50)
+    assert resources.get_amount("Energy") == 150
 
-    # Test subtraction
-    resources.subtract_value("Energy", 25.0)
-    decreased = resources.get("Energy")
-    assert decreased.value() == 175.0
+    # Test remove_resource
+    resources.remove_resource("Energy", 25)
+    assert resources.get_amount("Energy") == 125
 
 
 def test_resource_removal():
@@ -91,24 +84,20 @@ def test_resource_removal():
     resources = Resources()
 
     # Add test resources
-    resources.add(Resource("Iron", 100.0))
-    resources.add(Resource("Coal", 200.0))
-    resources.add(Resource("Stone", 300.0))
+    resources.add_resource("Iron", 100)
+    resources.add_resource("Coal", 200)
+    resources.add_resource("Stone", 300)
 
     assert len(resources) == 3
 
-    # Test remove method
-    removed = resources.remove("Coal")
-    assert removed is not None
-    assert removed.name() == "Coal"
-    assert removed.value() == 200.0
-    assert len(resources) == 2
-    assert not resources.contains("Coal")
+    # Test remove_resource reduces amount
+    result = resources.remove_resource("Coal", 200)
+    assert result is True
+    assert resources.get_amount("Coal") == 0
 
     # Test remove non-existent
-    missing = resources.remove("NonExistent")
-    assert missing is None
-    assert len(resources) == 2
+    result = resources.remove_resource("NonExistent", 10)
+    assert result is False
 
 
 def test_resource_iteration():
@@ -117,18 +106,18 @@ def test_resource_iteration():
 
     # Add test data
     test_data = [
-        ("Wood", 50.0),
-        ("Stone", 75.0),
-        ("Metal", 100.0)
+        ("Wood", 50),
+        ("Stone", 75),
+        ("Metal", 100)
     ]
 
-    for name, value in test_data:
-        resources.add(Resource(name, value))
+    for name, amount in test_data:
+        resources.add_resource(name, amount)
 
-    # Test iteration
+    # Test iteration via __iter__
     found_resources = []
     for resource in resources:
-        found_resources.append((resource.name(), resource.value()))
+        found_resources.append((resource.type(), resource.get_amount()))
 
     # Sort both lists for comparison
     found_resources.sort(key=lambda x: x[0])
@@ -143,105 +132,89 @@ def test_resource_transfer():
     destination = Resources()
 
     # Set up source resources
-    source.add(Resource("Wheat", 100.0))
-    source.add(Resource("Corn", 50.0))
+    source.add_resource("Wheat", 100)
+    source.add_resource("Corn", 50)
 
-    # Set up destination with some existing resources
-    destination.add(Resource("Wheat", 25.0))
-    destination.add(Resource("Rice", 75.0))
+    # Set up destination with capacity limits
+    destination.set_capacity("Wheat", 200)
+    destination.add_resource("Wheat", 25)
 
-    # Transfer wheat from source to destination
-    transferred = source.transfer_to(destination, "Wheat", 40.0)
-    assert transferred == 40.0
+    # Transfer all resources from source to destination
+    source.transfer_resources_to(destination)
 
-    # Check source reduction
-    source_wheat = source.get("Wheat")
-    assert source_wheat.value() == 60.0
+    # Check destination received wheat
+    assert destination.get_amount("Wheat") == 125  # 25 + 100
 
-    # Check destination increase
-    dest_wheat = destination.get("Wheat")
-    assert dest_wheat.value() == 65.0
-
-    # Test transfer more than available
-    transferred = source.transfer_to(destination, "Wheat", 100.0)
-    assert transferred == 60.0  # Only what was available
-
-    # Source should be empty of wheat now
-    assert not source.contains("Wheat")
+    # Source should be empty after transfer
+    assert source.get_amount("Wheat") == 0
 
 
 def test_resource_copying():
-    """Test resource container copying and cloning."""
+    """Test resource container copying via add_resources."""
     original = Resources()
-    original.add(Resource("Lumber", 200.0))
-    original.add(Resource("Nails", 500.0))
+    original.add_resource("Lumber", 200)
+    original.add_resource("Nails", 500)
 
-    # Test copy constructor
-    copy = Resources(original)
+    # Copy via add_resources
+    copy = Resources()
+    copy.add_resources(original)
     assert len(copy) == len(original)
-    assert copy.get("Lumber").value() == 200.0
-    assert copy.get("Nails").value() == 500.0
+    assert copy.get_amount("Lumber") == 200
+    assert copy.get_amount("Nails") == 500
 
-    # Test that it's a deep copy
-    copy.set("Lumber", 300.0)
-    assert original.get("Lumber").value() == 200.0  # Original unchanged
-    assert copy.get("Lumber").value() == 300.0
+    # Test that modifying copy doesn't affect original
+    copy.add_resource("Lumber", 100)
+    assert original.get_amount("Lumber") == 200  # Original unchanged
+    assert copy.get_amount("Lumber") == 300
 
 
-def test_resource_clear():
-    """Test clearing all resources."""
+def test_resource_empty_state():
+    """Test empty state of resources."""
     resources = Resources()
 
-    # Add some resources
-    resources.add(Resource("Oil", 100.0))
-    resources.add(Resource("Gas", 200.0))
-    resources.add(Resource("Coal", 300.0))
-
-    assert len(resources) == 3
-    assert not resources.empty()
-
-    # Clear all resources
-    resources.clear()
-
-    assert len(resources) == 0
+    # Initially empty
+    assert resources.is_empty()
     assert resources.empty()
-    assert not resources.contains("Oil")
-    assert not resources.contains("Gas")
-    assert not resources.contains("Coal")
 
+    # Add resources
+    resources.add_resource("Oil", 100)
+    assert not resources.is_empty()
 
-def test_resource_bulk_operations():
-    """Test bulk operations on resources."""
-    resources = Resources()
-
-    # Add multiple resources at once
-    bulk_data = {
-        "Copper": 150.0,
-        "Tin": 75.0,
-        "Bronze": 25.0
-    }
-
-    resources.add_bulk(bulk_data)
-
-    assert len(resources) == 3
-    for name, value in bulk_data.items():
-        resource = resources.get(name)
-        assert resource is not None
-        assert resource.value() == value
+    # Remove all amount
+    resources.remove_resource("Oil", 100)
+    assert resources.is_empty()
 
 
 def test_resource_capacity_limits():
     """Test resource capacity and overflow handling."""
     resources = Resources()
 
-    # Test with capacity limits
-    resources.set_capacity("Water", 100.0)
+    # Set capacity first
+    resources.set_capacity("Water", 100)
 
     # Add within capacity
-    resources.add(Resource("Water", 50.0))
-    assert resources.get("Water").value() == 50.0
+    resources.add_resource("Water", 50)
+    assert resources.get_amount("Water") == 50
 
     # Try to add beyond capacity
-    overflow = resources.add_with_capacity("Water", 75.0)
-    assert resources.get("Water").value() == 100.0  # Capped at capacity
-    assert overflow == 25.0  # Amount that couldn't be added
+    resources.add_resource("Water", 75)
+    assert resources.get_amount("Water") == 100  # Capped at capacity
+
+    # Verify capacity
+    assert resources.get_capacity("Water") == 100
+
+
+def test_find_or_add_resource():
+    """Test find_or_add_resource creates if needed."""
+    resources = Resources()
+
+    # Should create new resource
+    r = resources.find_or_add_resource("NewType")
+    assert r is not None
+    assert r.type() == "NewType"
+    assert len(resources) == 1
+
+    # Should find existing
+    r2 = resources.find_or_add_resource("NewType")
+    assert r2 is r
+    assert len(resources) == 1

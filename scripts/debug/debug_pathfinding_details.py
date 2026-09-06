@@ -6,14 +6,15 @@ Debug script to examine pathfinding logic in detail.
 import sys
 import os
 
-# Add the main python directory to sys.path
+# Add project root to sys.path for imports
 script_dir = os.path.dirname(os.path.abspath(__file__))
-if script_dir not in sys.path:
-    sys.path.insert(0, script_dir)
+project_root = os.path.abspath(os.path.join(script_dir, '..', '..'))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
 
-from src.simulation import Simulation
-from src.vector import Vector3f
-from src.dijkstra import Dijkstra
+from openglassbox.simulation import Simulation
+from openglassbox.vector import Vector3f
+from openglassbox.dijkstra import Dijkstra
 
 def debug_pathfinding_details():
     """Debug pathfinding logic step by step."""
@@ -23,7 +24,7 @@ def debug_pathfinding_details():
     simulation = Simulation(12, 12)
     
     # Parse the original TestCity.txt file
-    simfile = "demo/data/Simulations/TestCity.txt"
+    simfile = os.path.join(project_root, "demo", "data", "Simulations", "TestCity.txt")
     print(f"\n1. Parsing simulation file: {simfile}")
     if not simulation.parse(simfile):
         print(f"FAILED to parse {simfile}")
@@ -91,7 +92,7 @@ def debug_pathfinding_details():
     
     # Test pathfinding from n1 to find Work units
     print(f"\n   Testing pathfinding from n1 to find 'Work' units...")
-    from src.resources import Resources
+    from openglassbox.resources import Resources
     test_resources = Resources()
     
     next_node = dijkstra.find_next_point(n1, "Work", test_resources)

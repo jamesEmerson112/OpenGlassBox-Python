@@ -11,10 +11,10 @@ The tests ensure that Map objects and their resource logic behave as expected, m
 """
 
 import pytest
-from src.vector import Vector3D as Vector3f
-from src.city import City
-from src.map import Map, MapType
-from src.resource import Resource
+from openglassbox.vector import Vector3D as Vector3f
+from openglassbox.city import City
+from openglassbox.map import Map, MapType
+from openglassbox.resource import Resource
 
 
 def test_constants():

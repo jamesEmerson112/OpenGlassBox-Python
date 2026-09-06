@@ -12,11 +12,11 @@ This file covers:
 import pytest
 from unittest.mock import MagicMock, patch
 
-from src.dijkstra import Dijkstra
-from src.node import Node
-from src.vector import Vector3D
-from src.resources import Resources
-from src.path import Way, WayType
+from openglassbox.dijkstra import Dijkstra
+from openglassbox.node import Node
+from openglassbox.vector import Vector3D
+from openglassbox.resources import Resources
+from openglassbox.path import Way, WayType
 
 
 class MockUnit:

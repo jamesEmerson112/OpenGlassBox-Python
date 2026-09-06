@@ -25,28 +25,19 @@ described in a public conference talk.
 
 ## Status
 
-The engine and the demo run. The port is incomplete, and the repository has some rough edges worth
-knowing about before you spend time here.
-
-- **Tests**: 68 pass, 35 fail, 23 are skipped as unimplemented. Two further modules fail to collect
-  at all, so a plain `pytest tests/` aborts before running anything. See [Tests](#tests).
-- **Packaging does not work.** `pip install .` produces an empty distribution, because
-  `pyproject.toml` looks for an `openglassbox` package that does not exist — the code lives in `src/`
-  and `demo/`. Run from source instead.
-- **One entry point works**: `python demo/src/main.py`. The Makefile's `run-demo` and `run-enhanced`
-  targets are both broken, and so are `test-all`, `lint`, and `dev-setup`. Prefer the direct commands
-  in this README over `make`.
+The simulation engine, pygame demo, packaging, automated tests, and optional tick-by-tick session
+recording are available. The port remains a work in progress.
 
 ## Requirements
 
-Python 3.8 or newer, and pygame for the demo. Nothing in `src/` imports pygame — the simulation
-engine runs on the standard library alone.
+Python 3.10 or newer. Pygame is the only runtime dependency and is used by the demo; the simulation
+engine itself does not import it.
 
 ```sh
-python -m venv venv
-venv/Scripts/activate        # Windows
-# source venv/bin/activate   # Linux and macOS
-pip install -r requirements.txt
+python -m venv .venv
+.venv/Scripts/activate        # Windows
+# source .venv/bin/activate   # Linux and macOS
+python -m pip install -e ".[dev]"
 ```
 
 ## Running the demo
@@ -54,13 +45,15 @@ pip install -r requirements.txt
 From the repository root:
 
 ```sh
-python demo/src/main.py
+python -m demo.src.main
 ```
 
-The only flag is `--debug`, which sets `OPENGLASSBOX_DEBUG=1` and turns on per-agent logging.
+After installation, `openglassbox-demo` runs the same entry point. Pass `--debug` to enable
+per-agent logging or `--no-record` to disable the JSON session recording written when the demo
+exits.
 
 The demo opens a 1024x768 resizable window on a 12x12 grid and **starts paused** — press `P` to run
-it. It builds two cities from `demo/src/data/TestCity.txt`: Paris at (400, 200) with three nodes in a
+it. It builds two cities from `demo/data/Simulations/TestCity.txt`: Paris at (400, 200) with three nodes in a
 triangle, two `Home` units and two `Work` units, and Versailles at (0, 30) with two nodes, one `Home`
 and one `Work`, connected back to Paris.
 
@@ -96,24 +89,21 @@ the debug panels do nothing; `GlassBoxDemo.handle_mouse_click` is an empty stub.
 
 ## The simulation script
 
-Scenarios are written in a small DSL parsed by `src/script_parser.py`. The grammar is specified in
-[`diary/DSL_SPEC.md`](diary/DSL_SPEC.md).
+Scenarios are written in a small DSL parsed by `openglassbox/script_parser.py`. The grammar is
+specified in [`docs/DSL_SPEC.md`](docs/DSL_SPEC.md).
 
 The only scenario in the repo is `TestCity.txt`. It declares three resources (Water, Grass, People),
-a `Road` path type and a `Dirt` segment type, two agent types (`People` and `Worker`, both speed 10),
+a `Road` path type and a `Dirt` segment type, two agent types (`People` and `Worker`, both speed 33),
 two unit types (`Home`, which sends people to work, and `Work`, which sends them home and converts
 people into water), and two maps (Water at capacity 100, Grass at capacity 10 growing under the
 `CreateGrass` rule).
 
-It exists in three byte-identical copies, at `data/simulations/`, `demo/data/Simulations/`, and
-`demo/src/data/`. The demo loads the last of these. Note that some code paths spell the directory
-`Simulations` with a capital S, which resolves on Windows but would fail on a case-sensitive
-filesystem.
+The demo loads the scenario from `demo/data/Simulations/TestCity.txt`.
 
 ## Project layout
 
 ```
-src/                        Simulation engine, no pygame dependency
+openglassbox/               Installable simulation-engine package
   simulation.py             Simulation, the fixed-timestep loop (200 ticks/s)
   city.py                   City, the container for maps, paths, units, agents
   map.py                    Map, the 2D resource grid
@@ -137,9 +127,9 @@ demo/src/
   ui_renderer/              The live debug UI (three overlays) and renderers
   Display/debug_ui.py       A Dear ImGui-style UI that is NOT wired in — see below
 
-tests/                      21 pytest modules and 12 debug_*.py investigation scripts
-data/, demo/data/           Copies of TestCity.txt
-diary/                      Development notes and documentation
+tests/                      Pytest test suite
+scripts/debug/              Debug and diagnostic scripts
+docs/                       Developer documentation and development diary
 ```
 
 ### On the debug UI
@@ -156,47 +146,17 @@ and tree nodes. Nothing imports it, and it has drifted out of sync with the engi
 ## Tests
 
 ```sh
-python -m pytest tests/
+python -m pytest
 ```
 
-Run it from the repository root. `src/` has no `__init__.py` and there is no `conftest.py`, so imports
-resolve only because `python -m pytest` puts the working directory on `sys.path`. The bare `pytest`
-command is not equivalent and will fail.
-
-As of now the suite aborts during collection, because two modules cannot be imported:
-`tests/test_debug_ui.py` has a syntax error on line 12 (`import debug_ui DebugUI`), and
-`tests/test_demo_integration.py` imports `demo_enhanced`, a module deleted in commit `487b572`.
-Skip both to run the rest:
-
-```sh
-python -m pytest tests/ --ignore=tests/test_debug_ui.py --ignore=tests/test_demo_integration.py
-```
-
-That gives 68 passed, 35 failed, 23 skipped. Most failures are drift between the tests and the
-implementation rather than broken simulation logic — the tests call `addNode` where the code defines
-`add_node`, construct `Resource` with a signature it does not have, and try to instantiate the
-abstract `IRuleValue`. The 23 skips are explicit, marking parts of the port that were never finished.
-
-## Known gaps
-
-Beyond the test failures, these are the structural issues a contributor will run into:
-
-- Type definitions are duplicated. `MapType`, `PathType`, `UnitType`, and `WayType` each exist in two
-  or three of `src/city.py`, `src/map.py`, `src/path.py`, and `src/script_parser.py`.
-- `Node` is defined twice, in `src/node.py` and in `src/path.py`. `dijkstra.py` imports the former
-  while `Path.add_node` builds the latter.
-- `City.Listener` uses snake_case hooks (`on_city_added`) while `Simulation.Listener` uses camelCase
-  (`onCityAdded`), so the demo's listener overrides are never called.
-- `src/agent.py` hardcodes 60 ticks per second, contradicting the 200 in `src/simulation.py`.
-- `src/config.py` defines `GRID_SIZE`, but `src/city.py` and `src/node.py` each hardcode their own
-  copy instead of importing it.
+Run the suite from the repository root after installing the development dependencies.
 
 ## Documentation
 
-- [`diary/DSL_SPEC.md`](diary/DSL_SPEC.md) — the scenario file grammar.
-- [`diary/DEVELOPER_GUIDE.md`](diary/DEVELOPER_GUIDE.md) — a walkthrough of the architecture.
-- `diary/day1.md`, `day2.md`, `day4.md`, and `PORTING_SESSION_SUMMARY.md` are a development journal
-  kept during the port. They are historical and describe a layout the repository no longer has.
+- [`docs/DSL_SPEC.md`](docs/DSL_SPEC.md) — the scenario file grammar.
+- [`docs/DEVELOPER_GUIDE.md`](docs/DEVELOPER_GUIDE.md) — a walkthrough of the architecture.
+- `docs/diary/day1.md`, `day2.md`, and `day4.md` are the historical development journal.
+- [`docs/PORTING_SESSION_SUMMARY.md`](docs/PORTING_SESSION_SUMMARY.md) summarizes the porting work.
 
 ## License
 

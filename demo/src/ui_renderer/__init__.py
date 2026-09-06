@@ -8,7 +8,7 @@ by orchestrating specialized renderer components.
 import pygame
 from typing import Dict, List, Optional, Tuple, Any, Set
 
-from src.city import City
+from openglassbox.city import City
 
 from .colors import WHITE, BLACK, RED, GREEN, BLUE, GRAY, DARK_GRAY, LIGHT_GRAY, YELLOW, hex_to_rgb
 from .coordinate_system import CoordinateSystem

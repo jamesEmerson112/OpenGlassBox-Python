@@ -15,7 +15,7 @@ and edge cases of the original C++ simulation engine.
 
 import pytest
 import random
-from src.map_coordinates_inside_radius import MapCoordinatesInsideRadius
+from openglassbox.map_coordinates_inside_radius import MapCoordinatesInsideRadius
 
 # Use a fixed seed for reproducible tests
 random.seed(42)
@@ -48,7 +48,7 @@ def test_constructor_zero_unit_radius():
     assert coord1.m_distributed is False
 
     # Get the relative coordinates for radius 0
-    rel_coords = MapCoordinatesInsideRadius.relativeCoordinates(RADIUS)
+    rel_coords = MapCoordinatesInsideRadius.relative_coordinates(RADIUS)
     assert len(rel_coords) == 1
     assert rel_coords[0] == (0, 0)
     assert coord1.m_relativeCoord == rel_coords
@@ -65,7 +65,7 @@ def test_constructor_zero_unit_radius():
     assert coord2.m_distributed is True
 
     # For radius 0, even with randomization, we should still have one coordinate
-    rel_coords2 = MapCoordinatesInsideRadius.relativeCoordinates(RADIUS)
+    rel_coords2 = MapCoordinatesInsideRadius.relative_coordinates(RADIUS)
     assert len(rel_coords2) == 1
     assert rel_coords2[0] == (0, 0)
     assert len(coord2.m_relativeCoord) == 1
@@ -81,7 +81,7 @@ def test_relative_coordinates():
     coord.init(RADIUS, centerU, centerV, 0, 10, 0, 10, False)
 
     # Get the relative coordinates for radius 1
-    c = MapCoordinatesInsideRadius.relativeCoordinates(RADIUS)
+    c = MapCoordinatesInsideRadius.relative_coordinates(RADIUS)
 
     # Check that we have the expected coordinates (cross pattern for radius 1)
     assert len(c) == 5  # Should have 5 coordinates in the cross pattern
@@ -123,7 +123,7 @@ def test_cached_relative_coordinates_clipped():
     coord.init(RADIUS, centerU, centerV, 3, 4, 3, 4, False)
 
     # The relative coordinates are the same, but some will get clipped
-    c = MapCoordinatesInsideRadius.relativeCoordinates(RADIUS)
+    c = MapCoordinatesInsideRadius.relative_coordinates(RADIUS)
     assert len(c) == 5
 
     # Expected coordinates after clipping:
@@ -146,7 +146,7 @@ def test_cached_relative_coordinates_clipped():
 def test_different_radius_shapes():
     """Test coordinates generation for different radius sizes."""
     # Test for radius 2 (diamond shape)
-    radius2_coords = MapCoordinatesInsideRadius.relativeCoordinates(2)
+    radius2_coords = MapCoordinatesInsideRadius.relative_coordinates(2)
 
     # For a diamond with radius 2, we expect these coordinates:
     expected_radius2 = {

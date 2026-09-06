@@ -12,6 +12,7 @@ import os
 
 from .vector import Vector3f
 from .resources import Resources
+from .config import TICKS_PER_SECOND
 
 
 def debug_print(*args, **kwargs):
@@ -204,8 +205,7 @@ class Agent:
             # Moving from destination node to origin node
             direction = -1.0
 
-        # FIXME use dt() instead of constant
-        ticks_per_second = 60  # Placeholder value, should be imported from config
+        ticks_per_second = TICKS_PER_SECOND
         self.m_offset += (direction *
                          (self.m_type.speed / ticks_per_second) /
                          self.m_currentWay.magnitude())

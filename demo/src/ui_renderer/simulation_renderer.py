@@ -4,12 +4,12 @@ Core simulation rendering functionality.
 import pygame
 from typing import Dict, List, Optional, Tuple, Any, Set
 
-from src.city import City
-from src.map import Map
-from src.path import Path, Node, Way
-from src.unit import Unit
-from src.agent import Agent
-from src.vector import Vector3f
+from openglassbox.city import City
+from openglassbox.map import Map
+from openglassbox.path import Path, Node, Way
+from openglassbox.unit import Unit
+from openglassbox.agent import Agent
+from openglassbox.vector import Vector3f
 
 from .colors import hex_to_rgb, WHITE, BLACK
 from .coordinate_system import CoordinateSystem

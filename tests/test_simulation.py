@@ -13,9 +13,9 @@ matching the requirements for simulation setup, city registration, and update lo
 
 import pytest
 
-from src.simulation import Simulation, TICKS_PER_SECOND
-from src.vector import Vector3f
-from src.city import City
+from openglassbox.simulation import Simulation, TICKS_PER_SECOND
+from openglassbox.vector import Vector3f
+from openglassbox.city import City
 
 def test_constants():
     """Test that simulation constants are properly defined."""
@@ -47,10 +47,10 @@ def test_listener():
             self.added_cities = []
             self.removed_cities = []
 
-        def on_city_added(self, city):
+        def onCityAdded(self, city):
             self.added_cities.append(city)
 
-        def on_city_removed(self, city):
+        def onCityRemoved(self, city):
             self.removed_cities.append(city)
 
     listener = TestListener()
