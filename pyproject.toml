@@ -9,12 +9,12 @@ description = "OpenGlassBox simulation engine - Python port with enhanced debug 
 readme = "README.md"
 license = {file = "LICENSE"}
 authors = [
-    {name = "OpenGlassBox Contributors", email = "contrib@openglassbox.org"}
+    {name = "jamesEmerson112", email = "james.emerson.vo.2503@gmail.com"}
 ]
 maintainers = [
-    {name = "OpenGlassBox Contributors", email = "contrib@openglassbox.org"}
+    {name = "jamesEmerson112", email = "james.emerson.vo.2503@gmail.com"}
 ]
-keywords = ["simulation", "city", "pathfinding", "glassgox", "agent-based"]
+keywords = ["simulation", "city", "pathfinding", "glassbox", "agent-based"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
@@ -55,10 +55,10 @@ performance = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/openglassbox/openglassbox"
-"Bug Reports" = "https://github.com/openglassbox/openglassbox/issues"
-"Source" = "https://github.com/openglassbox/openglassbox"
-"Documentation" = "https://openglassbox.readthedocs.io/"
+"Homepage" = "https://github.com/jamesEmerson112/OpenGlassBox-Python"
+"Bug Reports" = "https://github.com/jamesEmerson112/OpenGlassBox-Python/issues"
+"Source" = "https://github.com/jamesEmerson112/OpenGlassBox-Python"
+"Upstream (C++)" = "https://github.com/Lecrapouille/OpenGlassBox"
 
 [project.scripts]
 openglassbox-demo = "demo.src.main:main"
@@ -131,10 +131,6 @@ python_functions = ["test_*"]
 addopts = [
     "--strict-markers",
     "--strict-config",
-    "--cov=openglassbox",
-    "--cov-report=term-missing",
-    "--cov-report=html:htmlcov",
-    "--cov-report=xml",
 ]
 markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",

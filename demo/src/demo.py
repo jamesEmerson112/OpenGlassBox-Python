@@ -35,7 +35,14 @@ class GlassBoxDemo:
         pygame.init()
         self.width = width
         self.height = height
-        self.screen = pygame.display.set_mode((width, height))
+        self.title = title
+        
+        # Fullscreen support
+        self.fullscreen = False
+        self.windowed_width = width
+        self.windowed_height = height
+        
+        self.screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
         pygame.display.set_caption(title)
         self.clock = pygame.time.Clock()
         self.running = True
@@ -67,6 +74,7 @@ class GlassBoxDemo:
         # Debug flags
         self.show_debug = True
         self.show_color_details = False  # Toggle for color details panel
+        self.show_comprehensive_debug = False  # Toggle for comprehensive debug panel
         self.show_tick_counter = True  # Show tick counter by default
         self.show_maps = True
         self.show_paths = True
@@ -108,6 +116,54 @@ class GlassBoxDemo:
     def handle_mouse_click(self, pos: Tuple[int, int]):
         """Handle mouse clicks."""
         pass
+
+    def handle_window_resize(self, new_width: int, new_height: int):
+        """Handle window resize events."""
+        self.width = new_width
+        self.height = new_height
+        
+        # Update the screen surface to the new size
+        if self.fullscreen:
+            self.screen = pygame.display.set_mode((new_width, new_height), pygame.FULLSCREEN)
+        else:
+            self.screen = pygame.display.set_mode((new_width, new_height), pygame.RESIZABLE)
+            # Update windowed dimensions for toggling back from fullscreen
+            self.windowed_width = new_width
+            self.windowed_height = new_height
+        
+        pygame.display.set_caption(self.title)
+        
+        # Update UI renderer with new dimensions
+        self.ui_renderer = UIRenderer(self.width, self.height)
+        
+        print(f"📏 Window resized to {new_width}x{new_height}")
+
+    def toggle_fullscreen(self):
+        """Toggle between fullscreen and windowed mode."""
+        if self.fullscreen:
+            # Switch to windowed mode
+            self.screen = pygame.display.set_mode((self.windowed_width, self.windowed_height), pygame.RESIZABLE)
+            self.width = self.windowed_width
+            self.height = self.windowed_height
+            self.fullscreen = False
+            print("🗖 Switched to windowed mode")
+        else:
+            # Switch to fullscreen mode
+            # Get the current display info to use native resolution
+            display_info = pygame.display.Info()
+            fullscreen_width = display_info.current_w
+            fullscreen_height = display_info.current_h
+            
+            self.screen = pygame.display.set_mode((fullscreen_width, fullscreen_height), pygame.FULLSCREEN)
+            self.width = fullscreen_width
+            self.height = fullscreen_height
+            self.fullscreen = True
+            print(f"🖵 Switched to fullscreen mode ({fullscreen_width}x{fullscreen_height})")
+        
+        pygame.display.set_caption(self.title)
+        
+        # Update UI renderer with new dimensions
+        self.ui_renderer = UIRenderer(self.width, self.height)
 
     def update(self, dt: float):
         """
@@ -171,6 +227,10 @@ class GlassBoxDemo:
         if self.show_color_details:
             self.ui_renderer.draw_color_details_panel(self.screen, self.simulation)
 
+        # Draw comprehensive debug panel if enabled
+        if self.show_comprehensive_debug:
+            self.ui_renderer.draw_comprehensive_debug_panel(self.screen, self.simulation)
+
         # Flip display
         pygame.display.flip()
 
@@ -191,7 +251,9 @@ class GlassBoxDemo:
         print("  R = Reset View")
         print("  D = Toggle Simple Debug Panel")
         print("  I = Toggle Color Details Panel")
+        print("  C = Toggle Comprehensive Debug Panel")
         print("  ESC = Quit")
+        print("📏 WINDOW: Drag corners to resize or use maximize button")
 
         # Target 60 FPS for smooth animation
         target_fps = 60

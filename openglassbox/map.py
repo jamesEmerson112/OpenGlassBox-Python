@@ -281,5 +281,3 @@ class Map:
     def get_capacity(self) -> int:
         """Get the maximum capacity per cell for this map."""
         return self.m_type.capacity
-
-

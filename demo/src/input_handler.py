@@ -18,9 +18,6 @@ class InputHandler:
         """Restart the simulation from scratch."""
         print("🔄 RESTARTING SIMULATION...")
         
-        # Clear current simulation
-        self.demo.simulation.clear_cities()
-        
         # Reset demo state
         self.demo.camera_offset_x = 0
         self.demo.camera_offset_y = 0
@@ -75,6 +72,10 @@ class InputHandler:
             if event.type == pygame.QUIT:
                 self.demo.running = False
 
+            elif event.type == pygame.VIDEORESIZE:
+                # Handle window resize events
+                self.demo.handle_window_resize(event.w, event.h)
+
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     self.demo.running = False
@@ -90,6 +91,13 @@ class InputHandler:
                         print("🎨 Color details panel enabled - shows entity colors!")
                     else:
                         print("📊 Color details panel disabled")
+                elif event.key == pygame.K_c:
+                    # Toggle comprehensive debug panel
+                    self.demo.show_comprehensive_debug = not self.demo.show_comprehensive_debug
+                    if self.demo.show_comprehensive_debug:
+                        print("🔬 Comprehensive debug panel enabled - detailed simulation introspection!")
+                    else:
+                        print("📋 Comprehensive debug panel disabled")
                 elif event.key == pygame.K_t:
                     self.demo.show_tick_counter = not self.demo.show_tick_counter
                 elif event.key == pygame.K_m:
@@ -109,6 +117,12 @@ class InputHandler:
                 elif event.key == pygame.K_F5 or (event.key == pygame.K_r and pygame.key.get_pressed()[pygame.K_LCTRL]):
                     # F5 or Ctrl+R for restart
                     self.restart_simulation()
+                elif event.key == pygame.K_F11:
+                    # F11 for fullscreen toggle
+                    self.demo.toggle_fullscreen()
+                elif event.key == pygame.K_RETURN and (pygame.key.get_pressed()[pygame.K_LALT] or pygame.key.get_pressed()[pygame.K_RALT]):
+                    # Alt+Enter for fullscreen toggle (alternative binding)
+                    self.demo.toggle_fullscreen()
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:  # Left mouse button
